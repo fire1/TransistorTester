@@ -31,7 +31,9 @@
 
 //#define LCD1602
 //#define LCD_I2C
-#define SSD1306
+//#define NOK5110
+#define OLED096
+#define OLED_I2C
 
 #ifdef LCD1602
   #ifdef LCD_I2C
@@ -42,10 +44,16 @@
   #endif
 #endif
 
-#ifdef SSD1306
-#include <Wire.h>
+#ifdef NOK5110
+  #include <SPI.h>
   #include <Adafruit_GFX.h>
-  //#include <Adafruit_PCD8544.h>
+  #include <Adafruit_PCD8544.h>
+#endif
+
+#ifdef OLED096
+  #include <SPI.h>
+  #include <Wire.h>
+  #include <Adafruit_GFX.h>
   #include <Adafruit_SSD1306.h>
 #endif
 
@@ -761,7 +769,7 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #endif
 
 
-#ifdef SSD1306
+#if defined(NOK5110) || defined(OLED096)
   #define LCD_CHAR_DIODE1 0x91
   #define LCD_CHAR_DIODE2 0x92
   #define LCD_CHAR_CAP    0x93
@@ -943,7 +951,7 @@ const unsigned char VCC_str[] MEM_TEXT = "VCC=";
 #endif
 
 
-const unsigned char VERSION_str[] MEM2_TEXT = "Ttester 1.08.2";
+const unsigned char VERSION_str[] MEM2_TEXT = "Ttester 1.08.3";
 
 const unsigned char AnKat[] MEM_TEXT = {'-', LCD_CHAR_DIODE1, '-',0};
 const unsigned char KatAn[] MEM_TEXT = {'-', LCD_CHAR_DIODE2, '-',0};
@@ -1257,13 +1265,26 @@ byte TestKeyPin = 17;  // A3
   #endif
 #endif
 
-#ifdef SSD1306
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#ifdef NOK5110
+  Adafruit_PCD8544 lcd = Adafruit_PCD8544(3, 4, 5, 6, 7);  // CLK,DIN,DC,CE,RST
+#endif
 
-// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
-#define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
-Adafruit_SSD1306 lcd(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+#ifdef OLED096
+  #ifdef OLED_I2C
+
+    #include <Wire.h>
+    #define OLED_RESET 7
+    #define SCREEN_WIDTH 128 // OLED display width, in pixels
+    #define SCREEN_HEIGHT 64 // OLED display height, in pixels
+    Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+  #else
+    #define OLED_CLK   7   // D0
+    #define OLED_MOSI  6   // D1
+    #define OLED_RESET 5   // RES
+    #define OLED_DC    4   // DC
+    #define OLED_CS    3   // CS
+    Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+  #endif
 #endif
 
 // begin of transistortester program
@@ -1294,19 +1315,35 @@ void setup()
     lcd_string("forArduino 1.08a");
   #endif
 
-  #ifdef SSD1306
+  #ifdef NOK5110
     lcd.begin();
     lcd.cp437(true);
-    //lcd.setContrast(50);
+    lcd.setContrast(40);
     lcd.clearDisplay();
+  #endif
 
+  #ifdef OLED096
+    #ifdef OLED_I2C
+      display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+    #else
+      display.begin(SSD1306_SWITCHCAPVCC);
+    #endif
+
+    display.cp437(true);
+    display.clearDisplay();
+    display.setTextColor(WHITE);
+    display.setTextSize(1);
+    display.setCursor(0,0);
+  #endif
+
+  #if defined(NOK5110) || defined(OLED096)
     lcd_string("Transistor");
     lcd_set_cursor(1, 0);
     lcd_string("Tester");
     lcd_set_cursor(2, 0);
     lcd_string("for Arduino");
     lcd_set_cursor(3, 0);
-    lcd_string("1.08.002");
+    lcd_string("1.08.003");
   #endif
 
   //ON_DDR = 0;
@@ -1421,8 +1458,12 @@ void loop()
   // Entry: if start key is pressed before shut down
 start:
 
-  #ifdef SSD1306
+  #ifdef NOK5110
     lcd.display();
+  #endif
+
+  #ifdef OLED096
+    display.display();
   #endif
 
   TestKey = 1;
@@ -1453,7 +1494,7 @@ start:
 
   ADCconfig.RefFlag = 0;
   Calibrate_UR();		// get Ref Voltages and Pin resistance
-  lcd_line1();    // 1 row 
+  lcd_line1();    // 1 row
   
   ADCconfig.U_Bandgap = ADC_internal_reference;  // set internal reference voltage for ADC
 
@@ -1510,7 +1551,7 @@ start:
       }
 
       lcd_fix_string(BatWeak);		// Battery weak
-    } else { // Battery-voltage OK
+    } else {                            // Battery-voltage OK
       lcd_fix_string(OK_str); 		// "OK"
     }
 
@@ -1572,8 +1613,13 @@ start:
     lcd_line2();		// LCD position row 2, column 1
   #endif
 
-  #ifdef SSD1306
+  #ifdef NOK5110
     lcd.display();
+  #endif
+
+  #ifdef OLED096
+    display.display();
+    display.setCursor(0,0);
   #endif
 
   EntladePins();		// discharge all capacitors!
@@ -1659,7 +1705,7 @@ start:
 
       UfOutput(0x70);
 
-      #ifdef SSD1306
+      #if defined(NOK5110) || defined(OLED096)
         lcd_line3();
       #endif
 
@@ -1812,13 +1858,13 @@ start:
         }
     }
 
-    #ifdef SSD1306
+    #if defined(NOK5110) || defined(OLED096)
       lcd_line2();
     #endif
 
     PinLayout('E','B','C'); 		// EBC= or 123=...
 
-    #ifdef SSD1306
+    #if defined(NOK5110) || defined(OLED096)
       lcd_line3();
     #else
       lcd_line2();  // 2 row 
@@ -1828,7 +1874,7 @@ start:
     DisplayValue(trans.hfe[0],0,0,3);
     lcd_space();
 
-    #ifdef SSD1306
+    #if defined(NOK5110) || defined(OLED096)
       lcd_line4();
     #endif
 
@@ -1861,7 +1907,7 @@ start:
       lcd_fix_string(mosfet_str);       // "-MOS "
     }
 
-    #ifdef SSD1306
+    #if defined(NOK5110) || defined(OLED096)
       lcd_line2();
     #endif
 
@@ -1889,7 +1935,7 @@ start:
         }
     }
 
-    #ifdef SSD1306
+    #if defined(NOK5110) || defined(OLED096)
       lcd_line3();
     #else
       lcd_line2();  // 2 row 
@@ -1901,7 +1947,7 @@ start:
       ReadCapacity(trans.b,trans.e);		// measure capacity
       DisplayValue(cap.cval,cap.cpre,'F',3);
 
-      #ifdef SSD1306
+      #if defined(NOK5110) || defined(OLED096)
         lcd_line4();
       #endif
 
@@ -1911,7 +1957,7 @@ start:
       lcd_data('=');
       DisplayValue(trans.uBE[1],-5,'A',2);
 
-      #ifdef SSD1306
+      #if defined(NOK5110) || defined(OLED096)
         lcd_line4();
       #endif
 
@@ -1981,7 +2027,7 @@ start:
         if (resis[0].lx != 0) {
           // resistor have also Inductance
 
-          #ifdef SSD1306
+          #if defined(NOK5110) || defined(OLED096)
             lcd_line3();
           #endif
 
@@ -2020,7 +2066,7 @@ start:
       GetVloss();			// get Voltage loss of capacitor
       if (cap.v_loss != 0) {
 
-        #ifdef SSD1306
+        #if defined(NOK5110) || defined(OLED096)
           lcd_line4();
         #endif
 
@@ -2036,7 +2082,7 @@ start:
       cap.esr = GetESR(cap.cb, cap.ca);		// get ESR of capacitor
       if (cap.esr < 65530) {
 
-        #ifdef SSD1306
+        #if defined(NOK5110) || defined(OLED096)
           lcd_line3();
         #endif
 
@@ -4024,7 +4070,7 @@ void GetIr(uint8_t hipin, uint8_t lopin) {
   u_res = W5msReadADC(lopin);		// read voltage
   if (u_res == 0) return;		// no Output, if no current in reverse direction
 
-  #ifdef SSD1306
+  #if defined(NOK5110) || defined(OLED096)
     lcd_line4();
   #endif
 
@@ -5672,8 +5718,12 @@ void lcd_set_cursor(uint8_t row, uint8_t col)
     lcd.command(CMD_SetDDRAMAddress | (col + row_offsets[row]));
   #endif
 
-  #ifdef SSD1306
+  #ifdef NOK5110
     lcd.setCursor(6*col, 10*row);
+  #endif
+
+  #ifdef OLED096
+    display.setCursor(6*col, 10*row);
   #endif
 
   uart_newline();
@@ -5734,8 +5784,12 @@ void lcd_data(unsigned char temp1) {
     lcd.write(temp1);
   #endif
 
-  #ifdef SSD1306
+  #ifdef NOK5110
     lcd.write(temp1);
+  #endif
+
+  #ifdef OLED096
+    display.write(temp1);
   #endif
 
   switch(temp1) {
@@ -5772,8 +5826,12 @@ void lcd_clear(void) {
     lcd.clear();
   #endif
 
-  #ifdef SSD1306
+  #ifdef NOK5110
     lcd.clearDisplay();
+  #endif
+
+  #ifdef OLED096
+    display.clearDisplay();
   #endif
 
   uart_newline();
