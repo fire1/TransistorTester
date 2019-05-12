@@ -25,7 +25,7 @@
 #define TP3 PC2
 #define TPext PC3
 // Port pin for 2.5V precision reference used for VCC check (optional)
-#define TPREF PC4
+#define TPREF A6 //PC4
 // Port pin for Battery voltage measuring
 #define TPBAT PC5
 
@@ -438,7 +438,7 @@ End of configuration
 /*
 With define SWUART_INVERT you can specify, if the software-UART operates normal or invers.
 in the normal mode the UART sends with usual logik level (Low = 0; High = 1).
-You can use this mode for direct connection to a µC, or a level converter like MAX232.
+You can use this mode for direct connection to a ï¿½C, or a level converter like MAX232.
 
 With invers mode the UART sends with invers logik (Low = 1, High = 0).
 This is the level of a standard RS232 port of a PC.
@@ -556,16 +556,16 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 
 #ifdef LCD_CYRILLIC
         #define LCD_CHAR_OMEGA  4       //Omega-character 
-        #define LCD_CHAR_U  5           //µ-character 
+        #define LCD_CHAR_U  5           //ï¿½-character 
 #else
         #define LCD_CHAR_OMEGA  244     //Omega-character
-        #define LCD_CHAR_U  228         //µ-character
+        #define LCD_CHAR_U  228         //ï¿½-character
 #endif
 #ifdef LCD_DOGM
 	#undef LCD_CHAR_OMEGA
 	#define LCD_CHAR_OMEGA 0x1e	//Omega-character for DOGM module
         #undef LCD_CHAR_U
-        #define LCD_CHAR_U  5           //µ-character for DOGM module loadable
+        #define LCD_CHAR_U  5           //ï¿½-character for DOGM module loadable
 #endif
 
 #define LCD_CHAR_DEGREE 0xdf            // Character for degree
