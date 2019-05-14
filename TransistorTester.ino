@@ -16,6 +16,7 @@
                          \_)                            */
 
 
+#include <Arduino.h>
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/sleep.h>
@@ -36,18 +37,20 @@
 #define OLED_I2C
 
 #ifdef LCD1602
-                                                                                                                        #ifdef LCD_I2C
-    #include <Wire.h>
-    #include <LiquidCrystal_I2C.h>
-  #else
-    #include <LiquidCrystal.h>
-  #endif
+
+#ifdef LCD_I2C
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#else
+#include <LiquidCrystal.h>
+#endif
 #endif
 
 #ifdef NOK5110
-                                                                                                                        #include <SPI.h>
-  #include <Adafruit_GFX.h>
-  #include <Adafruit_PCD8544.h>
+
+#include <SPI.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_PCD8544.h>
 #endif
 
 #ifdef OLED096
@@ -231,9 +234,9 @@
 #define TP3 2
 #define TPext 3
 // Port pin for 2.5V precision reference used for VCC check (optional)
-#define TPREF 4
+#define TPREF A6 // 19
 // Port pin for Battery voltage measuring
-#define TPBAT 5
+#define TPBAT A7 // 22
 
 /*
   exact values of used resistors (Ohm).
@@ -405,34 +408,6 @@
 #define CABLE_CAP 3
 
 
-// select the right Processor Typ
-/*
-#if defined(__AVR_ATmega48__)
-  #define PROCESSOR_TYP 168
-#elif defined(__AVR_ATmega48P__)
-  #define PROCESSOR_TYP 168
-#elif defined(__AVR_ATmega88__)
-  #define PROCESSOR_TYP 168
-#elif defined(__AVR_ATmega88P__)
-  #define PROCESSOR_TYP 168
-#elif defined(__AVR_ATmega168__)
-  #define PROCESSOR_TYP 168
-#elif defined(__AVR_ATmega168P__)
-  #define PROCESSOR_TYP 168
-#elif defined(__AVR_ATmega328__)
-  #define PROCESSOR_TYP 328
-#elif defined(__AVR_ATmega328P__)
-  #define PROCESSOR_TYP 328
-#elif defined(__AVR_ATmega640__)
-  #define PROCESSOR_TYP 1280
-#elif defined(__AVR_ATmega1280__)
-  #define PROCESSOR_TYP 1280
-#elif defined(__AVR_ATmega2560__)
-  #define PROCESSOR_TYP 1280
-#else
-  #define PROCESSOR_TYP 8
-#endif
-*/
 #define PROCESSOR_TYP 328
 
 
@@ -945,20 +920,22 @@ const unsigned char Ir_str[] MEM_TEXT = "  Ir=";
 //#define WITH_VEXT
 #endif
 #else
-                                                                                                                        #ifndef BAT_CHECK
-    #ifndef WITH_UART
-      //#define WITH_VEXT
-    #endif
-  #endif
+
+#ifndef BAT_CHECK
+#ifndef WITH_UART
+//#define WITH_VEXT
+#endif
+#endif
 #endif
 
 #ifdef WITH_VEXT
-                                                                                                                        const unsigned char Vext_str[] MEM_TEXT = "Vext=";
-  #define LCD_CLEAR
+
+const unsigned char Vext_str[] MEM_TEXT = "Vext=";
+#define LCD_CLEAR
 #endif
 
 
-const unsigned char VERSION_str[] MEM2_TEXT = "Ttester 1.08.3";
+const unsigned char VERSION_str[] MEM2_TEXT = "T.Tester 1.08.4";
 
 const unsigned char AnKat[] MEM_TEXT = {'-', LCD_CHAR_DIODE1, '-', 0};
 const unsigned char KatAn[] MEM_TEXT = {'-', LCD_CHAR_DIODE2, '-', 0};
@@ -966,7 +943,8 @@ const unsigned char Diodes[] MEM_TEXT = {'*', LCD_CHAR_DIODE1, ' ', ' ', 0};
 const unsigned char Resistor_str[] MEM_TEXT = {'-', LCD_CHAR_RESIS1, LCD_CHAR_RESIS2, '-', 0};
 
 #ifdef WITH_SELFTEST
-                                                                                                                        const unsigned char URefT[] MEM2_TEXT = "Ref=";
+
+const unsigned char URefT[] MEM2_TEXT = "Ref=";
   const unsigned char RHfakt[] MEM2_TEXT = "RHf=";
   const unsigned char RH1L[] MEM_TEXT = "RH-";
   const unsigned char RH1H[] MEM_TEXT = "RH+";
@@ -974,18 +952,20 @@ const unsigned char Resistor_str[] MEM_TEXT = {'-', LCD_CHAR_RESIS1, LCD_CHAR_RE
   const unsigned char RHRH[] MEM_TEXT = "+RH- 12 13 23";
   const unsigned char RHRL[] MEM_TEXT = "RH/RL";
   const unsigned char R0_str[] MEM2_TEXT = "R0=";
-  #define LCD_CLEAR
+#define LCD_CLEAR
 #endif
 
 #ifdef CHECK_CALL
-                                                                                                                        const unsigned char RIHI[] MEM_TEXT = "Ri_Hi=";
+
+const unsigned char RIHI[] MEM_TEXT = "Ri_Hi=";
   const unsigned char RILO[] MEM_TEXT = "Ri_Lo=";
   const unsigned char C0_str[] MEM_TEXT = "C0 ";
   const unsigned char T50HZ[] MEM_TEXT = " 50Hz";
 #endif
 
 #ifdef AUTO_CAL
-                                                                                                                        const unsigned char MinCap_str[] MEM2_TEXT = " >100nF";
+
+const unsigned char MinCap_str[] MEM2_TEXT = " >100nF";
   const unsigned char REF_C_str[] MEM2_TEXT = "REF_C=";
   const unsigned char REF_R_str[] MEM2_TEXT = "REF_R=";
 #endif
@@ -1281,9 +1261,11 @@ Adafruit_PCD8544 lcd = Adafruit_PCD8544(3, 4, 5, 6, 7);  // CLK,DIN,DC,CE,RST
 #ifdef OLED096
 #ifdef OLED_I2C
 
-#include <Wire.h>
 
 #define OLED_RESET 7
+
+#include <Wire.h>
+
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
@@ -1305,7 +1287,7 @@ void setup() {
 
     pinMode(3, OUTPUT);
     TCCR2B = TCCR2B & B11111000 | B00000001; // D3 for PWM frequency of 31372.55 Hz
-    analogWrite(3,255);
+    analogWrite(3, 255);
 #ifdef LCD1602
                                                                                                                             #ifdef LCD_I2C
       lcd.begin();
@@ -1426,7 +1408,7 @@ void setup() {
         // can happen, if any loop in the Program doen't finish.
         lcd_line1();
         lcd_fix_string(TestTimedOut);    // Output Timeout
-        wait_about3s();            // wait for 3 s
+        wait_about2s();            // wait for 3 s
         //ON_PORT = 0;			// shut off!
         //ON_DDR = (1<<ON_PIN);		// switch to GND
         //return;
@@ -1467,7 +1449,7 @@ void setup() {
 
 void loop() {
     // Entry: if start key is pressed before shut down
-    analogWrite(3,200);
+    analogWrite(3, 200);
     start:
 
 #ifdef NOK5110
