@@ -35,6 +35,8 @@
 //#define NOK5110
 #define OLED096
 #define OLED_I2C
+//#define lcdU8
+
 
 #ifdef LCD1602
 
@@ -59,6 +61,18 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+
+#endif
+
+#ifdef lcdU8
+
+#include <U8g2lib.h>
+
+#ifndef _U8G2LIB_HH
+
+#include "../libraries/U8g2/src/U8g2lib.h"
+
+#endif
 
 #endif
 
@@ -756,30 +770,30 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #define LCD_CHAR_U      0xB5
 
 #else
-                                                                                                                        // self build characters
-  #define LCD_CHAR_DIODE1  1      // Diode-Icon; will be generated as custom character
-  #define LCD_CHAR_DIODE2  2      // Diode-Icon; will be generated as custom character
-  #define LCD_CHAR_CAP 3          // Capacitor-Icon;  will be generated as custom character
-  // numbers of RESIS1 and RESIS2 are swapped for OLED display, which shows a corrupt RESIS1 character otherwise ???
-  #define LCD_CHAR_RESIS1 7       // Resistor left part will be generated as custom character
-  #define LCD_CHAR_RESIS2 6       // Resistor right part will be generated as custom character
+// self build characters
+#define LCD_CHAR_DIODE1  1      // Diode-Icon; will be generated as custom character
+#define LCD_CHAR_DIODE2  2      // Diode-Icon; will be generated as custom character
+#define LCD_CHAR_CAP 3          // Capacitor-Icon;  will be generated as custom character
+// numbers of RESIS1 and RESIS2 are swapped for OLED display, which shows a corrupt RESIS1 character otherwise ???
+#define LCD_CHAR_RESIS1 7       // Resistor left part will be generated as custom character
+#define LCD_CHAR_RESIS2 6       // Resistor right part will be generated as custom character
 
-  #ifdef LCD_CYRILLIC
-    #define LCD_CHAR_OMEGA  4       // Omega-character
-    #define LCD_CHAR_U  5           // micro-character
-  #else
-    #define LCD_CHAR_OMEGA  244     // Omega-character
-    #define LCD_CHAR_U  228         // micro-character
-  #endif
+#ifdef LCD_CYRILLIC
+#define LCD_CHAR_OMEGA  4       // Omega-character
+#define LCD_CHAR_U  5           // micro-character
+#else
+#define LCD_CHAR_OMEGA  244     // Omega-character
+#define LCD_CHAR_U  228         // micro-character
+#endif
 
-  #ifdef LCD_DOGM
-    #undef LCD_CHAR_OMEGA
-    #define LCD_CHAR_OMEGA 0x1e     // Omega-character for DOGM module
-    #undef LCD_CHAR_U
-    #define LCD_CHAR_U  5           // micro-character for DOGM module loadable
-  #endif
+#ifdef LCD_DOGM
+#undef LCD_CHAR_OMEGA
+#define LCD_CHAR_OMEGA 0x1e     // Omega-character for DOGM module
+#undef LCD_CHAR_U
+#define LCD_CHAR_U  5           // micro-character for DOGM module loadable
+#endif
 
-  #define LCD_CHAR_DEGREE 0xdf      // Character for degree
+#define LCD_CHAR_DEGREE 0xdf      // Character for degree
 #endif
 
 #endif  // #ifndef ADC_PORT
@@ -1270,13 +1284,18 @@ Adafruit_PCD8544 lcd = Adafruit_PCD8544(3, 4, 5, 6, 7);  // CLK,DIN,DC,CE,RST
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #else
-                                                                                                                        #define OLED_CLK   7   // D0
-    #define OLED_MOSI  6   // D1
-    #define OLED_RESET 5   // RES
-    #define OLED_DC    4   // DC
-    #define OLED_CS    3   // CS
-    Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+#define OLED_CLK   7   // D0
+#define OLED_MOSI  6   // D1
+#define OLED_RESET 5   // RES
+#define OLED_DC    4   // DC
+#define OLED_CS    3   // CS
+Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
 #endif
+#endif
+
+
+#ifdef lcdU8
+U8G2_SSD1306_128X32_UNIVISION_2_2ND_HW_I2C u8g2(U8G2_R0);
 #endif
 
 // begin of transistortester program
@@ -1285,9 +1304,7 @@ void setup() {
 
     pinMode(TestKeyPin, INPUT);
 
-    pinMode(3, OUTPUT);
-    TCCR2B = TCCR2B & B11111000 | B00000001; // D3 for PWM frequency of 31372.55 Hz
-    analogWrite(3, 255);
+
 #ifdef LCD1602
                                                                                                                             #ifdef LCD_I2C
       lcd.begin();
@@ -1328,6 +1345,18 @@ void setup() {
     display.setTextColor(WHITE);
     display.setTextSize(1);
     display.setCursor(0, 0);
+#endif
+
+
+#ifdef lcdU8
+    u8g2.begin();
+    lcd_string("Transistor");
+    lcd_set_cursor(1, 0);
+    lcd_string("Tester");
+    lcd_set_cursor(2, 0);
+    lcd_string("for Arduino");
+    lcd_set_cursor(3, 0);
+    lcd_string("1.08.2");
 #endif
 
 #if defined(NOK5110) || defined(OLED096)
@@ -1459,6 +1488,11 @@ void loop() {
 #ifdef OLED096
     display.display();
 #endif
+
+#ifdef lcdU8
+    u8g2.sendBuffer();
+#endif
+
 
     TestKey = 1;
     while (TestKey) {
@@ -1614,6 +1648,11 @@ void loop() {
 #ifdef OLED096
     display.display();
     display.setCursor(0, 0);
+#endif
+
+#ifdef lcdU8
+    u8g2.sendBuffer();
+    u8g2.setCursor(0,0);
 #endif
 
     EntladePins();        // discharge all capacitors!
@@ -5733,6 +5772,10 @@ void lcd_set_cursor(uint8_t row, uint8_t col) {
     display.setCursor(6 * col, 10 * row);
 #endif
 
+#ifdef lcdU8
+    u8g2.setCursor(u8g2.getMaxCharWidth() * col, u8g2.getMaxCharHeight() * row);
+#endif
+
     uart_newline();
 }
 
@@ -5799,6 +5842,10 @@ void lcd_data(unsigned char temp1) {
     display.write(temp1);
 #endif
 
+#ifdef lcdU8
+    u8g2.write(temp1);
+#endif
+
     switch (temp1) {
         case LCD_CHAR_DIODE1: {
             uart_putc('>');
@@ -5847,6 +5894,10 @@ void lcd_clear(void) {
 
 #ifdef OLED096
     display.clearDisplay();
+#endif
+
+#ifdef lcdU8
+    u8g2.clearDisplay();
 #endif
 
     uart_newline();
