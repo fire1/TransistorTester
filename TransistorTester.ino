@@ -1300,7 +1300,7 @@ U8G2_SSD1306_128X32_UNIVISION_2_2ND_HW_I2C u8g2(U8G2_R0);
 
 // begin of transistortester program
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     pinMode(TestKeyPin, INPUT);
 
