@@ -37,6 +37,7 @@
 #define OLED_I2C
 //#define lcdU8
 
+#define WITH_SELFTEST;
 
 #ifdef LCD1602
 
@@ -93,7 +94,7 @@
 // The LCD_CYRILLIC option is necessary, if you have a display with cyrillic characterset.
 // This lcd-display don't have a character for Ohm and for u (micro).
 // Russian language requires a LCD controller with russian characterset and option LCD_CYRILLIC!
-#define LCD_CYRILLIC
+//#define LCD_CYRILLIC
 
 // The LCD_DOGM option must be set for support of the DOG-M type of LCD modules with ST7036 controller.
 // For this LCD type the contrast must be set with software command.
@@ -147,7 +148,7 @@
 // NO_AREF_CAP tells your Software, that you have no Capacitor installed at pin AREF (21).
 // This enables a shorter wait-time for AUTOSCALE_ADC function.
 // A capacitor with 1nF can be used with the option NO_AREF_CAP set.
-#define NO_AREF_CAP
+//#define NO_AREF_CAP
 
 // The OP_MHZ option tells the software the Operating Frequency of your ATmega.
 // OP_MHZ 16
@@ -953,7 +954,7 @@ const unsigned char VERSION_str[] MEM2_TEXT = "T.Tester 1.08.4";
 
 const unsigned char AnKat[] MEM_TEXT = {'-', LCD_CHAR_DIODE1, '-', 0};
 const unsigned char KatAn[] MEM_TEXT = {'-', LCD_CHAR_DIODE2, '-', 0};
-const unsigned char Diodes[] MEM_TEXT = {'*', LCD_CHAR_DIODE1, ' ', ' ', 0};
+const unsigned char Diodes[] MEM_TEXT = {'*', '>', '|', ' ', 0};
 const unsigned char Resistor_str[] MEM_TEXT = {'-', LCD_CHAR_RESIS1, LCD_CHAR_RESIS2, '-', 0};
 
 #ifdef WITH_SELFTEST
