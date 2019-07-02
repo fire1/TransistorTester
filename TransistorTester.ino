@@ -33,9 +33,9 @@
 //#define LCD1602
 //#define LCD_I2C
 //#define NOK5110
-#define OLED096
+//#define OLED096
 #define OLED_I2C
-//#define lcdU8
+#define lcdU8
 
 
 #ifdef LCD1602
@@ -1295,7 +1295,10 @@ Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
 
 
 #ifdef lcdU8
-U8G2_SSD1306_128X32_UNIVISION_2_2ND_HW_I2C u8g2(U8G2_R0);
+
+//U8G2_SSD1306_128X32_UNIVISION_2_2ND_HW_I2C
+
+ U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
 #endif
 
 // begin of transistortester program
@@ -1350,6 +1353,9 @@ void setup() {
 
 #ifdef lcdU8
     u8g2.begin();
+    u8g2.setFont(u8g2_font_profont12_tf);
+
+
     lcd_string("Transistor");
     lcd_set_cursor(1, 0);
     lcd_string("Tester");
@@ -1357,6 +1363,7 @@ void setup() {
     lcd_string("for Arduino");
     lcd_set_cursor(3, 0);
     lcd_string("1.08.2");
+//
 #endif
 
 #if defined(NOK5110) || defined(OLED096)
@@ -1491,6 +1498,7 @@ void loop() {
 
 #ifdef lcdU8
     u8g2.sendBuffer();
+    u8g2.clearBuffer();
 #endif
 
 
@@ -1503,6 +1511,7 @@ void loop() {
         TestKey = digitalRead(TestKeyPin);
         delay(100);
     }
+
     lcd_clear();
     delay(100);
 
