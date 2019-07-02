@@ -68,7 +68,7 @@
 #ifdef lcdU8
 
 #include <U8g2lib.h>
-
+#include "fonts/u8g_font_pro_ev_12.c"
 #ifndef _U8G2LIB_HH
 
 #include "../libraries/U8g2/src/U8g2lib.h"
@@ -722,8 +722,8 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 
 #undef CHECK_CALL
 #ifdef WITH_SELFTEST
-                                                                                                                        // AutoCheck Function is needed
-  #define CHECK_CALL
+// AutoCheck Function is needed
+#define CHECK_CALL
 #endif
 
 #ifdef AUTO_CAL
@@ -892,9 +892,9 @@ const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
 #define Cathode_char 'C'
 
 #ifdef WITH_SELFTEST
-                                                                                                                        const unsigned char SELFTEST[] MEM_TEXT = "Selftest mode..";
-    const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
-    const unsigned char ATE[] MEM_TEXT = "Test End";
+const unsigned char SELFTEST[] MEM_TEXT = "Selftest mode..";
+const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
+const unsigned char ATE[] MEM_TEXT = "Test End";
 #endif
 #endif
 
@@ -960,22 +960,22 @@ const unsigned char Resistor_str[] MEM_TEXT = {'-', LCD_CHAR_RESIS1, LCD_CHAR_RE
 #ifdef WITH_SELFTEST
 
 const unsigned char URefT[] MEM2_TEXT = "Ref=";
-  const unsigned char RHfakt[] MEM2_TEXT = "RHf=";
-  const unsigned char RH1L[] MEM_TEXT = "RH-";
-  const unsigned char RH1H[] MEM_TEXT = "RH+";
-  const unsigned char RLRL[] MEM_TEXT = "+RL- 12 13 23";
-  const unsigned char RHRH[] MEM_TEXT = "+RH- 12 13 23";
-  const unsigned char RHRL[] MEM_TEXT = "RH/RL";
-  const unsigned char R0_str[] MEM2_TEXT = "R0=";
+const unsigned char RHfakt[] MEM2_TEXT = "RHf=";
+const unsigned char RH1L[] MEM_TEXT = "RH-";
+const unsigned char RH1H[] MEM_TEXT = "RH+";
+const unsigned char RLRL[] MEM_TEXT = "+RL- 12 13 23";
+const unsigned char RHRH[] MEM_TEXT = "+RH- 12 13 23";
+const unsigned char RHRL[] MEM_TEXT = "RH/RL";
+const unsigned char R0_str[] MEM2_TEXT = "R0=";
 #define LCD_CLEAR
 #endif
 
 #ifdef CHECK_CALL
 
 const unsigned char RIHI[] MEM_TEXT = "Ri_Hi=";
-  const unsigned char RILO[] MEM_TEXT = "Ri_Lo=";
-  const unsigned char C0_str[] MEM_TEXT = "C0 ";
-  const unsigned char T50HZ[] MEM_TEXT = " 50Hz";
+const unsigned char RILO[] MEM_TEXT = "Ri_Lo=";
+const unsigned char C0_str[] MEM_TEXT = "C0 ";
+const unsigned char T50HZ[] MEM_TEXT = " 50Hz";
 #endif
 
 #ifdef AUTO_CAL
@@ -1299,7 +1299,7 @@ Adafruit_SSD1306 display(OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
 
 //U8G2_SSD1306_128X32_UNIVISION_2_2ND_HW_I2C
 
- U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
 #endif
 
 // begin of transistortester program
@@ -1354,7 +1354,8 @@ void setup() {
 
 #ifdef lcdU8
     u8g2.begin();
-    u8g2.setFont(u8g2_font_profont12_tf);
+//    u8g2.setFont(u8g2_font_profont12_tf);
+    u8g2.setFont(u8g_font_pro_ev);
 
 
     lcd_string("Transistor");
@@ -1521,6 +1522,7 @@ void loop() {
     PartReady = 0;
     PartMode = 0;
     WithReference = 0;        // no precision reference voltage
+    WithReference = 1;        //  precision reference voltage
     ADC_DDR = TXD_MSK;        // activate Software-UART
     ResistorsFound = 0;        // no resistors found
     cap.ca = 0;
@@ -1616,6 +1618,7 @@ void loop() {
             // display VCC= only first time
             lcd_line2();
             lcd_fix_string(VCC_str);            // VCC=
+            lcd_space();
             DisplayValue(ADCconfig.U_AVCC, -3, 'V', 3);    // Display 3 Digits of this mV units
             //lcd_space();
             //DisplayValue(RRpinMI,-1,LCD_CHAR_OMEGA,4);
@@ -1662,7 +1665,7 @@ void loop() {
 
 #ifdef lcdU8
     u8g2.sendBuffer();
-    u8g2.setCursor(0,0);
+    u8g2.setCursor(0, 0);
 #endif
 
     EntladePins();        // discharge all capacitors!
@@ -1674,7 +1677,7 @@ void loop() {
     }
 
 #ifdef CHECK_CALL
-    AutoCheck();		// check, if selftest should be done
+    AutoCheck();        // check, if selftest should be done
 #endif
 
     // check all 6 combinations for the 3 pins
@@ -1980,7 +1983,7 @@ void loop() {
         }
 
 #if defined(NOK5110) || defined(OLED096)
-        lcd_line3();
+            lcd_line3();
 #else
         lcd_line2();  // 2 row
 #endif
@@ -2408,13 +2411,15 @@ void RefVoltage(void) {
 #endif
 
 #ifdef LCD_CLEAR
-                                                                                                                        void lcd_clear_line(void) {
-  // writes 20 spaces to LCD-Display, Cursor must be positioned to first column
-  unsigned char ll;
-  for (ll=0;ll<20;ll++) {
-    lcd_space();
-  }
+
+void lcd_clear_line(void) {
+    // writes 20 spaces to LCD-Display, Cursor must be positioned to first column
+    unsigned char ll;
+    for (ll = 0; ll < 20; ll++) {
+        lcd_space();
+    }
 }
+
 #endif
 
 
@@ -2606,232 +2611,232 @@ void PinLayout(char pin1, char pin2, char pin3) {
 void AutoCheck(void) {
 #ifdef WITH_SELFTEST
 
-                                                                                                                            uint8_t tt;		// number of running test
-  uint8_t ww;		// counter for repeating the tests
-  int  adcmv[7];
-  uint16_t u680;	// 3 * (Voltage at 680 Ohm)
+    uint8_t tt;        // number of running test
+    uint8_t ww;        // counter for repeating the tests
+    int adcmv[7];
+    uint16_t u680;    // 3 * (Voltage at 680 Ohm)
 
-  // define the maximum count of repetitions MAX_REP
-  #define MAX_REP 4
+    // define the maximum count of repetitions MAX_REP
+#define MAX_REP 4
 
-  #ifdef AUTO_CAL
+#ifdef AUTO_CAL
     uint8_t cap_found;	// counter for found capacitor
 
-    #ifdef AUTOSCALE_ADC
+#ifdef AUTOSCALE_ADC
       int8_t udiff;		// difference between ADC Voltage with VCC or Bandgap reference
       int8_t udiff2;
-    #endif
-  #endif
+#endif
+#endif
 
-  ADC_PORT = TXD_VAL;
-  ADC_DDR = TXD_MSK;
+    ADC_PORT = TXD_VAL;
+    ADC_DDR = TXD_MSK;
 
-  #define RequireShortedProbes
+#define RequireShortedProbes
 
-  if (AllProbesShorted() != 3) return;
+    if (AllProbesShorted() != 3) return;
 
-  lcd_clear();
-  lcd_fix_string(SELFTEST);		// "Selftest mode.."
+    lcd_clear();
+    lcd_fix_string(SELFTEST);        // "Selftest mode.."
 
-  lcd_line2();
-  lcd_fix2_string(R0_str);		// "R0="
+    lcd_line2();
+    lcd_fix2_string(R0_str);        // "R0="
 
-  eeprom_write_byte((uint8_t *)(&EE_ESR_ZEROtab[2]), (int8_t)0);	// clear zero offset
-  eeprom_write_byte((uint8_t *)(&EE_ESR_ZEROtab[3]), (int8_t)0);	// clear zero offset
-  eeprom_write_byte((uint8_t *)(&EE_ESR_ZEROtab[1]), (int8_t)0);	// clear zero offset
+    eeprom_write_byte((uint8_t *) (&EE_ESR_ZEROtab[2]), (int8_t) 0);    // clear zero offset
+    eeprom_write_byte((uint8_t *) (&EE_ESR_ZEROtab[3]), (int8_t) 0);    // clear zero offset
+    eeprom_write_byte((uint8_t *) (&EE_ESR_ZEROtab[1]), (int8_t) 0);    // clear zero offset
 
-  adcmv[0] = GetESR(TP3, TP1);
-  adcmv[1] = GetESR(TP3, TP2);
-  adcmv[2] = GetESR(TP2, TP1);
+    adcmv[0] = GetESR(TP3, TP1);
+    adcmv[1] = GetESR(TP3, TP2);
+    adcmv[2] = GetESR(TP2, TP1);
 
-  DisplayValue(adcmv[0],-2,' ',3);
-  DisplayValue(adcmv[1],-2,' ',3);
-  DisplayValue(adcmv[2],-2,LCD_CHAR_OMEGA,3);
+    DisplayValue(adcmv[0], -2, ' ', 3);
+    DisplayValue(adcmv[1], -2, ' ', 3);
+    DisplayValue(adcmv[2], -2, LCD_CHAR_OMEGA, 3);
 
-  if (adcmv[0] < 60) {
-    eeprom_write_byte((uint8_t *)(&EE_ESR_ZEROtab[2]), (int8_t)adcmv[0]);	// fix zero offset
-  }
-  if (adcmv[1] < 60) {
-    eeprom_write_byte((uint8_t *)(&EE_ESR_ZEROtab[3]), (int8_t)adcmv[1]);	// fix zero offset
-  }
-  if (adcmv[2] < 60) {
-    eeprom_write_byte((uint8_t *)(&EE_ESR_ZEROtab[1]), (int8_t)adcmv[2]);	// fix zero offset
-  }
-
-  for(tt=0; tt<12; tt++) {
-    wait_about500ms();
-
-    if(!(ON_PIN_REG & (1<<RST_PIN))) {
-      // if key is pressed, don't repeat
-      break;
+    if (adcmv[0] < 60) {
+        eeprom_write_byte((uint8_t *) (&EE_ESR_ZEROtab[2]), (int8_t) adcmv[0]);    // fix zero offset
     }
-  }   // end for tt
+    if (adcmv[1] < 60) {
+        eeprom_write_byte((uint8_t *) (&EE_ESR_ZEROtab[3]), (int8_t) adcmv[1]);    // fix zero offset
+    }
+    if (adcmv[2] < 60) {
+        eeprom_write_byte((uint8_t *) (&EE_ESR_ZEROtab[1]), (int8_t) adcmv[2]);    // fix zero offset
+    }
 
-  #define TEST_COUNT 8
+    for (tt = 0; tt < 12; tt++) {
+        wait_about500ms();
 
-  for(tt=1; tt<TEST_COUNT; tt++) {	// loop for all Tests
-    for(ww=0; ww<MAX_REP; ww++) {	// repeat the test MAX_REP times
-      lcd_line2();			// Cursor to column 1, row 2
-      lcd_clear_line();			// clear total line
-      lcd_line1();			// Cursor to column 1, row 1
-      lcd_clear_line();			// clear total line
-      lcd_line1();			// Cursor to column 1, row 1
-      lcd_data('T');			// output the Testmode "T"
-      lcd_string(utoa(tt, outval, 10));	// output Test number
-      lcd_space();
+        if (!(ON_PIN_REG & (1 << RST_PIN))) {
+            // if key is pressed, don't repeat
+            break;
+        }
+    }   // end for tt
 
-      if (tt == 1) {		// output of reference voltage and factors for capacity measurement
-        Calibrate_UR();		// get Reference voltage, Pin resistance
-        lcd_fix2_string(URefT);	// "URef="
-        DisplayValue(ref_mv,-3,'V',4);
-        lcd_line2();				// Cursor to column 1, row 2
-        lcd_fix2_string(RHfakt);		// "RHf="
-        lcd_string(utoa(RHmultip, outval, 10));
-        ADCconfig.Samples = 190;		// set number of ADC reads near to maximum
-      }
+#define TEST_COUNT 8
 
-      if (tt == 2) { 	// how equal are the RL resistors?
-        u680 = ((long)ADCconfig.U_AVCC * (PIN_RM + R_L_VAL) / (PIN_RM + R_L_VAL + R_L_VAL + PIN_RP));
-        R_PORT = 1<<(TP1*2);			// RL1 to VCC
-        R_DDR = (1<<(TP1*2)) | (1<<(TP2*2));	// RL2 to -
-        adcmv[0] = W20msReadADC(TP1);
-        adcmv[0] -= u680;
-        R_DDR = (1<<(TP1*2)) | (1<<(TP3*2));	// RL3 to -
-        adcmv[1] = W20msReadADC(TP1);
-        adcmv[1] -= u680;
-        R_PORT = 1<<(TP2*2);			// RL2 to VCC
-        R_DDR = (1<<(TP2*2)) | (1<<(TP3*2));	// RL3 to -
-        adcmv[2] = W20msReadADC(TP2);
-        adcmv[2] -= u680;
-        lcd_fix_string(RLRL);			// "RLRL"
-      }
+    for (tt = 1; tt < TEST_COUNT; tt++) {    // loop for all Tests
+        for (ww = 0; ww < MAX_REP; ww++) {    // repeat the test MAX_REP times
+            lcd_line2();            // Cursor to column 1, row 2
+            lcd_clear_line();            // clear total line
+            lcd_line1();            // Cursor to column 1, row 1
+            lcd_clear_line();            // clear total line
+            lcd_line1();            // Cursor to column 1, row 1
+            lcd_data('T');            // output the Testmode "T"
+            lcd_string(utoa(tt, outval, 10));    // output Test number
+            lcd_space();
 
-      if (tt == 3) { 	// how equal are the RH resistors
-        R_PORT = 2<<(TP1*2);			// RH1 to VCC
-        R_DDR = (2<<(TP1*2)) | (2<<(TP2*2));	// RH2 to -
-        adcmv[0] = W20msReadADC(TP1);
-        adcmv[3] = ADCconfig.U_AVCC / 2;
-        adcmv[0] -= adcmv[3];
-        R_DDR = (2<<(TP1*2)) | (2<<(TP3*2));	// RH3 to -
-        adcmv[1] = W20msReadADC(TP1);
-        adcmv[1] -= adcmv[3];
-        R_PORT = 2<<(TP2*2);			// RH2 to VCC
-        R_DDR = (2<<(TP2*2)) | (2<<(TP3*2));	// RH3 to -
-        adcmv[2] = W20msReadADC(TP2);
-        adcmv[2] -= adcmv[3];
-        lcd_fix_string(RHRH);			// "RHRH"
-      }
+            if (tt == 1) {        // output of reference voltage and factors for capacity measurement
+                Calibrate_UR();        // get Reference voltage, Pin resistance
+                lcd_fix2_string(URefT);    // "URef="
+                DisplayValue(ref_mv, -3, 'V', 4);
+                lcd_line2();                // Cursor to column 1, row 2
+                lcd_fix2_string(RHfakt);        // "RHf="
+                lcd_string(utoa(RHmultip, outval, 10));
+                ADCconfig.Samples = 190;        // set number of ADC reads near to maximum
+            }
 
-      if (tt == 4) { 	// Text release probes
-        lcd_fix_string(RELPROBE);		// "Release Probes"
-        if (AllProbesShorted() != 0) ww = MAX_REP-2;
-      }
+            if (tt == 2) {    // how equal are the RL resistors?
+                u680 = ((long) ADCconfig.U_AVCC * (PIN_RM + R_L_VAL) / (PIN_RM + R_L_VAL + R_L_VAL + PIN_RP));
+                R_PORT = 1 << (TP1 * 2);            // RL1 to VCC
+                R_DDR = (1 << (TP1 * 2)) | (1 << (TP2 * 2));    // RL2 to -
+                adcmv[0] = W20msReadADC(TP1);
+                adcmv[0] -= u680;
+                R_DDR = (1 << (TP1 * 2)) | (1 << (TP3 * 2));    // RL3 to -
+                adcmv[1] = W20msReadADC(TP1);
+                adcmv[1] -= u680;
+                R_PORT = 1 << (TP2 * 2);            // RL2 to VCC
+                R_DDR = (1 << (TP2 * 2)) | (1 << (TP3 * 2));    // RL3 to -
+                adcmv[2] = W20msReadADC(TP2);
+                adcmv[2] -= u680;
+                lcd_fix_string(RLRL);            // "RLRL"
+            }
 
-      if (tt == 5) { 	// can we switch the ADC pins to GND across R_H resistor?
-        R_PORT = 0;
-        R_DDR = 2<<(TP1*2);		// Pin 1 over R_H to GND
-        adcmv[0] = W20msReadADC(TP1);
+            if (tt == 3) {    // how equal are the RH resistors
+                R_PORT = 2 << (TP1 * 2);            // RH1 to VCC
+                R_DDR = (2 << (TP1 * 2)) | (2 << (TP2 * 2));    // RH2 to -
+                adcmv[0] = W20msReadADC(TP1);
+                adcmv[3] = ADCconfig.U_AVCC / 2;
+                adcmv[0] -= adcmv[3];
+                R_DDR = (2 << (TP1 * 2)) | (2 << (TP3 * 2));    // RH3 to -
+                adcmv[1] = W20msReadADC(TP1);
+                adcmv[1] -= adcmv[3];
+                R_PORT = 2 << (TP2 * 2);            // RH2 to VCC
+                R_DDR = (2 << (TP2 * 2)) | (2 << (TP3 * 2));    // RH3 to -
+                adcmv[2] = W20msReadADC(TP2);
+                adcmv[2] -= adcmv[3];
+                lcd_fix_string(RHRH);            // "RHRH"
+            }
 
-        R_DDR = 2<<(TP2*2);		// Pin 2 over R_H to GND
-        adcmv[1] = W20msReadADC(TP2);
+            if (tt == 4) {    // Text release probes
+                lcd_fix_string(RELPROBE);        // "Release Probes"
+                if (AllProbesShorted() != 0) ww = MAX_REP - 2;
+            }
 
-        R_DDR = 2<<(TP3*2);		// Pin 3 over R_H to GND
-        adcmv[2] = W20msReadADC(TP3);
-        lcd_fix_string(RH1L);		// "RH_Lo="
-      }
+            if (tt == 5) {    // can we switch the ADC pins to GND across R_H resistor?
+                R_PORT = 0;
+                R_DDR = 2 << (TP1 * 2);        // Pin 1 over R_H to GND
+                adcmv[0] = W20msReadADC(TP1);
 
-      if (tt == 6) { 	// can we switch the ADC pins to VCC across the R_H resistor?
-        R_DDR = 2<<(TP1*2);		// Pin 1 over R_H to VCC
-        R_PORT = 2<<(TP1*2);
-        adcmv[0] = W20msReadADC(TP1) - ADCconfig.U_AVCC;
-        R_DDR = 2<<(TP2*2);		// Pin 2 over R_H to VCC
-        R_PORT = 2<<(TP2*2);
-        adcmv[1] = W20msReadADC(TP2) - ADCconfig.U_AVCC;
-        R_DDR = 2<<(TP3*2);		// Pin 3 over R_H to VCC
-        R_PORT = 2<<(TP3*2);
-        adcmv[2] = W20msReadADC(TP3) - ADCconfig.U_AVCC;
-        lcd_fix_string(RH1H);		// "RH_Hi="
-      }
+                R_DDR = 2 << (TP2 * 2);        // Pin 2 over R_H to GND
+                adcmv[1] = W20msReadADC(TP2);
 
-      if (tt == 7) { 	// can we switch the ADC pins to VCC across the R_H resistor?
-        u680 = ((long)ADCconfig.U_AVCC * (PIN_RM + R_L_VAL) / (PIN_RM + R_L_VAL + R_H_VAL*100));
-        R_PORT = 2<<(TP1*2);			// RH1 to VCC
-        R_DDR = (2<<(TP1*2)) | (1<<(TP1*2));	// RH1 to +, RL1 to -
-        adcmv[0] = W20msReadADC(TP1);
-        adcmv[0] -= u680;
-        R_PORT = 2<<(TP2*2);			// RH2 to VCC
-        R_DDR = (2<<(TP2*2)) | (1<<(TP2*2));	// RH2 to +, RL2 to -
-        adcmv[1] = W20msReadADC(TP2);
-        adcmv[1] -= u680;
-        R_PORT = 2<<(TP3*2);			// RH3 to VCC
-        R_DDR = (2<<(TP3*2)) | (1<<(TP3*2));	// RH3 to +, RL3 to -
-        adcmv[2] = W20msReadADC(TP3);
-        adcmv[2] -= u680;
-        lcd_fix_string(RHRL);			// "RH/RL"
-      }
+                R_DDR = 2 << (TP3 * 2);        // Pin 3 over R_H to GND
+                adcmv[2] = W20msReadADC(TP3);
+                lcd_fix_string(RH1L);        // "RH_Lo="
+            }
 
-      if (tt > 1) {	// output 3 voltages
-        lcd_line2();				// Cursor to column 1, row 2
-        lcd_string(itoa(adcmv[0], outval, 10));	// output voltage 1
-        lcd_space();
-        lcd_string(itoa(adcmv[1], outval, 10));	// output voltage 2
-        lcd_space();
-        lcd_string(itoa(adcmv[2], outval, 10));	// output voltage 3
-      }
+            if (tt == 6) {    // can we switch the ADC pins to VCC across the R_H resistor?
+                R_DDR = 2 << (TP1 * 2);        // Pin 1 over R_H to VCC
+                R_PORT = 2 << (TP1 * 2);
+                adcmv[0] = W20msReadADC(TP1) - ADCconfig.U_AVCC;
+                R_DDR = 2 << (TP2 * 2);        // Pin 2 over R_H to VCC
+                R_PORT = 2 << (TP2 * 2);
+                adcmv[1] = W20msReadADC(TP2) - ADCconfig.U_AVCC;
+                R_DDR = 2 << (TP3 * 2);        // Pin 3 over R_H to VCC
+                R_PORT = 2 << (TP3 * 2);
+                adcmv[2] = W20msReadADC(TP3) - ADCconfig.U_AVCC;
+                lcd_fix_string(RH1H);        // "RH_Hi="
+            }
 
-        ADC_DDR =  TXD_MSK;		// all-Pins to Input
-        ADC_PORT = TXD_VAL;		// all ADC-Ports to GND
-        R_DDR = 0;			// all R-Ports to Input
-        R_PORT = 0;
+            if (tt == 7) {    // can we switch the ADC pins to VCC across the R_H resistor?
+                u680 = ((long) ADCconfig.U_AVCC * (PIN_RM + R_L_VAL) / (PIN_RM + R_L_VAL + R_H_VAL * 100));
+                R_PORT = 2 << (TP1 * 2);            // RH1 to VCC
+                R_DDR = (2 << (TP1 * 2)) | (1 << (TP1 * 2));    // RH1 to +, RL1 to -
+                adcmv[0] = W20msReadADC(TP1);
+                adcmv[0] -= u680;
+                R_PORT = 2 << (TP2 * 2);            // RH2 to VCC
+                R_DDR = (2 << (TP2 * 2)) | (1 << (TP2 * 2));    // RH2 to +, RL2 to -
+                adcmv[1] = W20msReadADC(TP2);
+                adcmv[1] -= u680;
+                R_PORT = 2 << (TP3 * 2);            // RH3 to VCC
+                R_DDR = (2 << (TP3 * 2)) | (1 << (TP3 * 2));    // RH3 to +, RL3 to -
+                adcmv[2] = W20msReadADC(TP3);
+                adcmv[2] -= u680;
+                lcd_fix_string(RHRL);            // "RH/RL"
+            }
 
-      if(!(ON_PIN_REG & (1<<RST_PIN))) {
-        // if key is pressed, don't repeat
-        break;
-      }
-      wait_about500ms();
+            if (tt > 1) {    // output 3 voltages
+                lcd_line2();                // Cursor to column 1, row 2
+                lcd_string(itoa(adcmv[0], outval, 10));    // output voltage 1
+                lcd_space();
+                lcd_string(itoa(adcmv[1], outval, 10));    // output voltage 2
+                lcd_space();
+                lcd_string(itoa(adcmv[2], outval, 10));    // output voltage 3
+            }
 
-      if(!(ON_PIN_REG & (1<<RST_PIN))) {
-        // if key is pressed, don't repeat
-        break;
-      }
-      wait_about500ms();
+            ADC_DDR = TXD_MSK;        // all-Pins to Input
+            ADC_PORT = TXD_VAL;        // all ADC-Ports to GND
+            R_DDR = 0;            // all R-Ports to Input
+            R_PORT = 0;
 
-    }  // end for ww
-    wait_about1s();
+            if (!(ON_PIN_REG & (1 << RST_PIN))) {
+                // if key is pressed, don't repeat
+                break;
+            }
+            wait_about500ms();
 
-  }  // end for tt
+            if (!(ON_PIN_REG & (1 << RST_PIN))) {
+                // if key is pressed, don't repeat
+                break;
+            }
+            wait_about500ms();
 
-  lcd_clear();
-  lcd_fix_string(RIHI);				// "RiHi="
-  DisplayValue(RRpinPL,-1,LCD_CHAR_OMEGA,3);
-  lcd_line2();
-  lcd_fix_string(RILO);				// "RiLo="
-  DisplayValue(RRpinMI,-1,LCD_CHAR_OMEGA,3);
-  wait_about2s();
+        }  // end for ww
+        wait_about1s();
 
-  //measure Zero offset for Capacity measurement
-  adcmv[3] = 0;
-  PartFound = PART_NONE;
-  ReadCapacity(TP3, TP1);
-  adcmv[5] = (unsigned int) cap.cval_uncorrected.dw;	// save capacity value of empty Pin 1:3
-  ReadCapacity(TP3, TP2);
-  adcmv[6] = (unsigned int) cap.cval_uncorrected.dw;	// save capacity value of empty Pin 2:3
-  ReadCapacity(TP2, TP1);
-  adcmv[2] = (unsigned int) cap.cval_uncorrected.dw;	// save capacity value of empty Pin 1:2
-  ReadCapacity(TP1, TP3);
-  adcmv[1] = (unsigned int) cap.cval_uncorrected.dw;	// save capacity value of empty Pin 3:1
-  ReadCapacity(TP2, TP3);
-  adcmv[4] = (unsigned int) cap.cval_uncorrected.dw;	// save capacity value of empty Pin 3:2
-  ReadCapacity(TP1, TP2);
-  adcmv[0] = (unsigned int) cap.cval_uncorrected.dw;	// save capacity value of empty Pin 2:1
+    }  // end for tt
 
-  lcd_clear();
-  lcd_fix_string(C0_str);			// output "C0 "
-  DisplayValue(adcmv[5],0,' ',3);		// output cap0 1:3
-  DisplayValue(adcmv[6],0,' ',3);		// output cap0 2:3
-  DisplayValue(adcmv[2],-12,'F',3);		// output cap0 1:2
+    lcd_clear();
+    lcd_fix_string(RIHI);                // "RiHi="
+    DisplayValue(RRpinPL, -1, LCD_CHAR_OMEGA, 3);
+    lcd_line2();
+    lcd_fix_string(RILO);                // "RiLo="
+    DisplayValue(RRpinMI, -1, LCD_CHAR_OMEGA, 3);
+    wait_about2s();
 
-  #ifdef AUTO_CAL
+    //measure Zero offset for Capacity measurement
+    adcmv[3] = 0;
+    PartFound = PART_NONE;
+    ReadCapacity(TP3, TP1);
+    adcmv[5] = (unsigned int) cap.cval_uncorrected.dw;    // save capacity value of empty Pin 1:3
+    ReadCapacity(TP3, TP2);
+    adcmv[6] = (unsigned int) cap.cval_uncorrected.dw;    // save capacity value of empty Pin 2:3
+    ReadCapacity(TP2, TP1);
+    adcmv[2] = (unsigned int) cap.cval_uncorrected.dw;    // save capacity value of empty Pin 1:2
+    ReadCapacity(TP1, TP3);
+    adcmv[1] = (unsigned int) cap.cval_uncorrected.dw;    // save capacity value of empty Pin 3:1
+    ReadCapacity(TP2, TP3);
+    adcmv[4] = (unsigned int) cap.cval_uncorrected.dw;    // save capacity value of empty Pin 3:2
+    ReadCapacity(TP1, TP2);
+    adcmv[0] = (unsigned int) cap.cval_uncorrected.dw;    // save capacity value of empty Pin 2:1
+
+    lcd_clear();
+    lcd_fix_string(C0_str);            // output "C0 "
+    DisplayValue(adcmv[5], 0, ' ', 3);        // output cap0 1:3
+    DisplayValue(adcmv[6], 0, ' ', 3);        // output cap0 2:3
+    DisplayValue(adcmv[2], -12, 'F', 3);        // output cap0 1:2
+
+#ifdef AUTO_CAL
     for (ww=0;ww<7;ww++) {
       if (adcmv[ww] > 70) goto no_c0save;
     }
@@ -2845,11 +2850,11 @@ void AutoCheck(void) {
     lcd_fix_string(OK_str);		// output "OK"
 
 no_c0save:
-  #endif
+#endif
 
-  wait_about2s();
+    wait_about2s();
 
-  #ifdef AUTO_CAL
+#ifdef AUTO_CAL
     // Message C > 100nF
     cap_found = 0;
     for (ww=0; ww<64; ww++) {
@@ -2881,7 +2886,7 @@ no_c0save:
         lcd_fix2_string(REF_C_str);			// "REF_C="
         lcd_string(itoa(load_diff, outval, 10));	// output REF_C_KORR
 
-        #if 0
+#if 0
           // Test for switching level of the digital input of port TP3
 
           for (ii=0;ii<8;ii++) {
@@ -2913,9 +2918,9 @@ no_c0save:
             DisplayValue(adcmv[0],-3,'V',4);
             wait_about1s();
           }
-        #endif
+#endif
 
-        #ifdef AUTOSCALE_ADC
+#ifdef AUTOSCALE_ADC
           ADC_PORT =  TXD_VAL;			// ADC-Port 1 to GND
           ADC_DDR = 1<<TP1 | TXD_MSK;		// ADC-Pin  1 to output 0V
           R_DDR = 2<<(TP3*2);			// Pin 3 over R_H to GND
@@ -2943,7 +2948,7 @@ no_c0save:
           (void) eeprom_write_byte((uint8_t *)(&RefDiff), (uint8_t)udiff2);	// hold offset for true reference Voltage
 
           lcd_string(itoa(udiff2, outval, 10));	// output correction voltage
-        #endif
+#endif
 
         wait_about4s();
         break;
@@ -2954,17 +2959,17 @@ no_c0save:
       wait_about200ms();			// wait additional time
 
     }  // end for ww
-  #endif
+#endif
 
-  ADCconfig.Samples = ANZ_MESS;		// set to configured number of ADC samples
+    ADCconfig.Samples = ANZ_MESS;        // set to configured number of ADC samples
 
-  lcd_clear();
-  lcd_line2();
-  lcd_fix2_string(VERSION_str);		// "Version ..."
-  lcd_line1();
-  lcd_fix_string(ATE);			// "Selftest End"
+    lcd_clear();
+    lcd_line2();
+    lcd_fix2_string(VERSION_str);        // "Version ..."
+    lcd_line1();
+    lcd_fix_string(ATE);            // "Selftest End"
 
-  #ifdef FREQUENCY_50HZ
+#ifdef FREQUENCY_50HZ
     //#define TEST_SLEEP_MODE		// only select for checking the sleep delay
     lcd_fix_string(T50HZ);		// " 50Hz"
     ADC_PORT = TXD_VAL;
@@ -2975,19 +2980,19 @@ no_c0save:
       for (ii=0;ii<100;ii++) {		// for 2 s generate 50 Hz
         R_PORT = (1<<(TP2*2));		// Pin 2 over R_L to VCC, Pin 3 over R_L to GND
 
-        #ifdef TEST_SLEEP_MODE
+#ifdef TEST_SLEEP_MODE
           sleep_5ms(2); 		// test of timing of sleep mode call
-        #else
+#else
           wait10ms();			// normal delay
-        #endif
+#endif
 
         R_PORT = (1<<(TP3*2));		// Pin 3 over R_L to VCC, Pin 2 over R_L to GND
 
-        #ifdef TEST_SLEEP_MODE
+#ifdef TEST_SLEEP_MODE
           sleep_5ms(2); 		// test of timing of sleep mode call
-        #else
+#else
           wait10ms();			// normal delay
-        #endif
+#endif
 
         wdt_reset();
       }
@@ -2997,62 +3002,60 @@ no_c0save:
         break;
       }
     }
-  #endif
+#endif
 
-  PartFound = PART_NONE;
-  wait_about1s();
+    PartFound = PART_NONE;
+    wait_about1s();
 #endif
 }
 
 
 #ifdef RequireShortedProbes
-                                                                                                                        /*
- *  check for a short circuit between two probes
- *  from Markus R.
- *
- *  requires:
- *  - ID of first probe (0-2)
- *  - ID of second probe (0-2)
- *
- *  returns:
- *  - 0 if not shorted
- *  - 1 if shorted
- */
 
-uint8_t ShortedProbes(uint8_t Probe1, uint8_t Probe2)
-{
-  uint8_t           Flag1 = 0;  // return value
-  unsigned int      U1; 	// voltage at probe #1 in mV
-  unsigned int      U2; 	// voltage at probe #2 in mV
-  unsigned int      URH;	// half of reference voltage
+/*
+*  check for a short circuit between two probes
+*  from Markus R.
+*
+*  requires:
+*  - ID of first probe (0-2)
+*  - ID of second probe (0-2)
+*
+*  returns:
+*  - 0 if not shorted
+*  - 1 if shorted
+*/
 
-  // Set up a voltage divider between the two probes:
-  // - Probe1: Rl pull-up
-  // - Probe2: Rl pull-down
+uint8_t ShortedProbes(uint8_t Probe1, uint8_t Probe2) {
+    uint8_t Flag1 = 0;  // return value
+    unsigned int U1;    // voltage at probe #1 in mV
+    unsigned int U2;    // voltage at probe #2 in mV
+    unsigned int URH;    // half of reference voltage
 
-  R_PORT = pgm_read_byte(&PinRLtab[Probe1]);
-  R_DDR = pgm_read_byte(&PinRLtab[Probe1]) | pgm_read_byte(&PinRLtab[Probe2]);
+    // Set up a voltage divider between the two probes:
+    // - Probe1: Rl pull-up
+    // - Probe2: Rl pull-down
 
-  // read voltages
-  U1 = ReadADC(Probe1);
-  U2 = ReadADC(Probe2);
+    R_PORT = pgm_read_byte(&PinRLtab[Probe1]);
+    R_DDR = pgm_read_byte(&PinRLtab[Probe1]) | pgm_read_byte(&PinRLtab[Probe2]);
 
-  // We expect both probe voltages to be about the same and
-  // to be half of Vcc (allowed difference +/- 20mV).
+    // read voltages
+    U1 = ReadADC(Probe1);
+    U2 = ReadADC(Probe2);
 
-  URH = ADCconfig.U_AVCC / 2;
-  if ((U1 > URH - 20) && (U1 < URH + 20))
-  {
-    if ((U2 > URH - 20) && (U2 < URH + 20))
-    {
-      Flag1 = 1;
+    // We expect both probe voltages to be about the same and
+    // to be half of Vcc (allowed difference +/- 20mV).
+
+    URH = ADCconfig.U_AVCC / 2;
+    if ((U1 > URH - 20) && (U1 < URH + 20)) {
+        if ((U2 > URH - 20) && (U2 < URH + 20)) {
+            Flag1 = 1;
+        }
     }
-  }
 
-  // reset port
-  R_DDR = 0;
+    // reset port
+    R_DDR = 0;
 
-  return Flag1;
+    return Flag1;
 }
 
 /*
@@ -3064,17 +3067,17 @@ uint8_t ShortedProbes(uint8_t Probe1, uint8_t Probe2)
  *  - number of probe pairs short-circuited (3 = all)
  */
 
-uint8_t AllProbesShorted(void)
-{
-  uint8_t Flag2;      // return value
+uint8_t AllProbesShorted(void) {
+    uint8_t Flag2;      // return value
 
-  // check all possible combinations
-  Flag2 = ShortedProbes(TP1, TP2);
-  Flag2 += ShortedProbes(TP1, TP3);
-  Flag2 += ShortedProbes(TP2, TP3);
+    // check all possible combinations
+    Flag2 = ShortedProbes(TP1, TP2);
+    Flag2 += ShortedProbes(TP1, TP3);
+    Flag2 += ShortedProbes(TP2, TP3);
 
-  return Flag2;
+    return Flag2;
 }
+
 #endif
 
 /* -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- */
@@ -4194,7 +4197,7 @@ unsigned int ReadADC(uint8_t Probe) {
 #ifdef NO_AREF_CAP
         wait100us();        // time for voltage stabilization
 #else
-        wait_about10ms(); 	// time for voltage stabilization
+        wait_about10ms();    // time for voltage stabilization
 #endif
     }
 #endif
@@ -5373,7 +5376,7 @@ uint16_t GetESR(uint8_t hipin, uint8_t lopin) {
 #ifdef NO_AREF_CAP
     wait100us();        // time for voltage stabilization
 #else
-    wait_about10ms();		// time for voltage stabilization with 100nF
+    wait_about10ms();        // time for voltage stabilization with 100nF
 #endif
 
     // start voltage must be negativ
@@ -5825,7 +5828,7 @@ void lcd_testpin(unsigned char temp) {
 
 // send space character to LCD
 void lcd_space(void) {
-    lcd_data(' ');
+    u8g2.print(F(" "));
 }
 
 void lcd_fix_string(const unsigned char *data) {
