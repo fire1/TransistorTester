@@ -132,7 +132,7 @@ char foo;
 //Maximum number of measurements without any components found.
 #define CYCLE_MAX             5
 //ADC voltage reference based on Vcc (in mV). 
-#define UREF_VCC              5001
+#define UREF_VCC              4999
 /*
   Offset for the internal bandgap voltage reference (in mV): -100 up to 100
    - To compensate any difference between real value and measured value.

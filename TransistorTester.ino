@@ -78,7 +78,7 @@
 
 #endif
 
-
+#define AUTO_CAL
 // ******** config options for your Semiconductor tester
 
 // Every changing of this Makefile will result in new compiling the whole
@@ -716,7 +716,7 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #ifdef WITH_AUTO_REF
 #define AUTO_RH
 #else
-                                                                                                                        #ifdef AUTO_CAL
+#ifdef AUTO_CAL
     #define AUTO_RH
   #endif
 #endif
@@ -878,7 +878,7 @@ const uint16_t RHtab[] PROGMEM = {954, 903, 856, 814, 775, 740, 707, 676, 648};
 #endif
 
 #if defined(LANG_ENGLISH)        // english
-const unsigned char TestRunning[] MEM_TEXT = "testing...";
+const unsigned char TestRunning[] MEM_TEXT = "Testing...";
 const unsigned char BatWeak[] MEM_TEXT = "weak";
 const unsigned char BatEmpty[] MEM_TEXT = "empty!";
 const unsigned char TestFailed2[] MEM_TEXT = "damaged ";
@@ -1650,7 +1650,7 @@ void loop() {
     }
 #endif
 
-    lcd_line2();            // LCD position row 2, column 1
+    lcd_line3();            // LCD position row 2, column 1
     lcd_fix_string(TestRunning);    // String: testing...
 
 #ifndef DebugOut
