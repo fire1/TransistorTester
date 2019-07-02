@@ -69,6 +69,7 @@
 
 #include <U8g2lib.h>
 #include "fonts/u8g_font_pro_ev_12.c"
+
 #ifndef _U8G2LIB_HH
 
 #include "../libraries/U8g2/src/U8g2lib.h"
@@ -761,7 +762,7 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #endif
 
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
 #define LCD_CHAR_DIODE1 0x91
 #define LCD_CHAR_DIODE2 0x92
 #define LCD_CHAR_CAP    0x93
@@ -953,7 +954,7 @@ const unsigned char Vext_str[] MEM_TEXT = "Vext=";
 const unsigned char VERSION_str[] MEM2_TEXT = "T.Tester 1.08.4";
 
 const unsigned char AnKat[] MEM_TEXT = {'-', LCD_CHAR_DIODE1, '-', 0};
-const unsigned char KatAn[] MEM_TEXT = {'-', '«', '-', 0};
+const unsigned char KatAn[] MEM_TEXT = {'-', '|', '<', '-', 0};
 const unsigned char Diodes[] MEM_TEXT = {'-', '>', '|', ' ', 0};
 const unsigned char Resistor_str[] MEM_TEXT = {'-', LCD_CHAR_RESIS1, LCD_CHAR_RESIS2, '-', 0};
 
@@ -1240,10 +1241,10 @@ COMMON unsigned int display_time;	// display time of measurement in ms units
 #define CMD1_SetContrast         0x70     // set Contrast C3:C0 (instruction table 1, DOGM)
 
 // Makros for LCD
-#define lcd_line1() lcd_set_cursor(0,0)  // move to beginning of 1 row
-#define lcd_line2() lcd_set_cursor(1,0)  // move to beginning of 2 row
-#define lcd_line3() lcd_set_cursor(2,0)  // move to beginning of 3 row
-#define lcd_line4() lcd_set_cursor(3,0)  // move to beginning of 4 row
+#define lcd_line1() lcd_set_cursor(1,0)  // move to beginning of 1 row
+#define lcd_line2() lcd_set_cursor(2,0)  // move to beginning of 2 row
+#define lcd_line3() lcd_set_cursor(3,0)  // move to beginning of 3 row
+#define lcd_line4() lcd_set_cursor(4,0)  // move to beginning of 4 row
 
 #define uart_newline() Serial.println()
 
@@ -1500,7 +1501,9 @@ void loop() {
 
 #ifdef lcdU8
     u8g2.sendBuffer();
+    delay(300);
     u8g2.clearBuffer();
+    lcd_line1();
 #endif
 
 
@@ -1751,7 +1754,7 @@ void loop() {
 
             UfOutput(0x70);
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
             lcd_line3();
 #endif
 
@@ -1905,13 +1908,13 @@ void loop() {
             }
         }
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096)|| defined(lcdU8)
         lcd_line2();
 #endif
 
         PinLayout('E', 'B', 'C');        // EBC= or 123=...
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096)|| defined(lcdU8)
         lcd_line3();
 #else
         lcd_line2();  // 2 row
@@ -1921,7 +1924,7 @@ void loop() {
         DisplayValue(trans.hfe[0], 0, 0, 3);
         lcd_space();
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
         lcd_line4();
 #endif
 
@@ -1954,7 +1957,7 @@ void loop() {
             lcd_fix_string(mosfet_str);       // "-MOS "
         }
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
         lcd_line2();
 #endif
 
@@ -1982,7 +1985,7 @@ void loop() {
             }
         }
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
             lcd_line3();
 #else
         lcd_line2();  // 2 row
@@ -1994,7 +1997,7 @@ void loop() {
             ReadCapacity(trans.b, trans.e);        // measure capacity
             DisplayValue(cap.cval, cap.cpre, 'F', 3);
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
             lcd_line4();
 #endif
 
@@ -2004,7 +2007,7 @@ void loop() {
             lcd_data('=');
             DisplayValue(trans.uBE[1], -5, 'A', 2);
 
-#if defined(NOK5110) || defined(OLED096)
+#if  defined(NOK5110) || defined(OLED096) || defined(lcdU8)
             lcd_line4();
 #endif
 
@@ -2074,7 +2077,7 @@ void loop() {
             if (resis[0].lx != 0) {
                 // resistor have also Inductance
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
                 lcd_line3();
 #endif
 
@@ -2113,7 +2116,7 @@ void loop() {
         GetVloss();            // get Voltage loss of capacitor
         if (cap.v_loss != 0) {
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
             lcd_line4();
 #endif
 
@@ -2129,7 +2132,7 @@ void loop() {
         cap.esr = GetESR(cap.cb, cap.ca);        // get ESR of capacitor
         if (cap.esr < 65530) {
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
             lcd_line3();
 #endif
 
@@ -4125,7 +4128,7 @@ void GetIr(uint8_t hipin, uint8_t lopin) {
     u_res = W5msReadADC(lopin);        // read voltage
     if (u_res == 0) return;        // no Output, if no current in reverse direction
 
-#if defined(NOK5110) || defined(OLED096)
+#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
     lcd_line4();
 #endif
 
@@ -5769,25 +5772,8 @@ void Calibrate_UR(void) {
 #endif
 
 void lcd_set_cursor(uint8_t row, uint8_t col) {
-#ifdef LCD1602
-                                                                                                                            int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
-    if ( row >= 2 ) {
-      row = 1;
-    }
-    lcd.command(CMD_SetDDRAMAddress | (col + row_offsets[row]));
-#endif
+    u8g2.setCursor(u8g2.getMaxCharWidth() * col + 2, u8g2.getMaxCharHeight() * row + (u8g2.getMaxCharHeight() / 3));
 
-#ifdef NOK5110
-    lcd.setCursor(6*col, 10*row);
-#endif
-
-#ifdef OLED096
-    display.setCursor(6 * col, 10 * row);
-#endif
-
-#ifdef lcdU8
-    u8g2.setCursor(u8g2.getMaxCharWidth() * col, u8g2.getMaxCharHeight() * row);
-#endif
 
     uart_newline();
 }
@@ -5799,26 +5785,22 @@ void lcd_string(char *data) {
     }
 }
 
+/**
+ * deprecated
+ * @param data
+ */
 void lcd_pgm_string(const unsigned char *data) {
-    unsigned char cc;
-    while (1) {
-        cc = pgm_read_byte(data);
-        if ((cc == 0) || (cc == 128)) return;
-        lcd_data(cc);
-        data++;
-    }
+    u8g2.print((class __FlashStringHelper *) data);
+    Serial.print((class __FlashStringHelper *) data);
+//    unsigned char cc;
+//    while (1) {
+//        cc = pgm_read_byte(data);
+//        if ((cc == 0) || (cc == 128)) return;
+//        lcd_data(cc);
+//        data++;
+//    }
 }
 
-void lcd_pgm_custom_char(uint8_t location, const unsigned char *chardata) {
-#ifdef LCD1602
-                                                                                                                            location &= 0x7;
-    lcd.command(CMD_SetCGRAMAddress | (location << 3));
-    for(uint8_t i=0;i<8;i++) {
-      lcd.write(pgm_read_byte(chardata));
-      chardata++;
-    }
-#endif
-}
 
 // sends numeric character (Pin Number) to the LCD
 // from binary 0 we send ASCII 1
@@ -5832,13 +5814,8 @@ void lcd_space(void) {
 }
 
 void lcd_fix_string(const unsigned char *data) {
-    unsigned char cc;
-    while (1) {
-        cc = MEM_read_byte(data);
-        if ((cc == 0) || (cc == 128)) return;
-        lcd_data(cc);
-        data++;
-    }
+    u8g2.print((class __FlashStringHelper *) data);
+    Serial.print((class __FlashStringHelper *) data);
 }
 
 // sends data byte to the LCD
