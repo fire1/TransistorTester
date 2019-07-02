@@ -953,8 +953,8 @@ const unsigned char Vext_str[] MEM_TEXT = "Vext=";
 const unsigned char VERSION_str[] MEM2_TEXT = "T.Tester 1.08.4";
 
 const unsigned char AnKat[] MEM_TEXT = {'-', LCD_CHAR_DIODE1, '-', 0};
-const unsigned char KatAn[] MEM_TEXT = {'-', LCD_CHAR_DIODE2, '-', 0};
-const unsigned char Diodes[] MEM_TEXT = {'*', '>', '|', ' ', 0};
+const unsigned char KatAn[] MEM_TEXT = {'-', '«', '-', 0};
+const unsigned char Diodes[] MEM_TEXT = {'-', '>', '|', ' ', 0};
 const unsigned char Resistor_str[] MEM_TEXT = {'-', LCD_CHAR_RESIS1, LCD_CHAR_RESIS2, '-', 0};
 
 #ifdef WITH_SELFTEST
