@@ -1,9 +1,5 @@
 ### Default command to convert BDF to U8G2 format
 
-Bold with icons
 
-`bdfconv.exe -f 1 -m "32-1104,~382-902"  -n u8g_font_opel_ic_13 -o u8g_font_opel_ic_13.c OpelSansBold-13.bdf -v`
+`.\bdfconv_2_22.exe -f 1 -m "32-225"  -n u8g_font_pro_ev -o u8g_font_pro_ev_12.c .\ProFontmedium-ev-12.bdf -v `
 
- Small, info text
- 
-`bdfconv.exe -f 1 -m "32-1104,~382-902"  -n u8g_font_opel_ic_12 -o u8g_font_opel_ic_12.c OpelSansMedium-12.bdf -v`

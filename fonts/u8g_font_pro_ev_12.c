@@ -4,18 +4,6 @@
   Glyphs: 194/256
   BBX Build Mode: 0
 */
-
-#include <stdlib.h>
-#include <avr/pgmspace.h>
-#include <U8g2lib.h>
-
-
-#ifndef _U8G2LIB_HH
-// Some IDE syntax mishmash fixer
-#include "../../libraries/U8g2/src/U8g2lib.h"
-
-#endif
-
 const uint8_t u8g_font_pro_ev[2065] U8G2_FONT_SECTION("u8g_font_pro_ev") = 
   "\302\0\3\2\4\4\4\4\5\14\14\0\376\10\376\11\377\1T\2\250\7\370 \5\0}\26!\7\201\212"
   "\26\227\0\42\7\63\351\26\211%#\13U\270\66\225A\251\14J\5$\20\245xV\331RQ\262-\211"

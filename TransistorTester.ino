@@ -17,23 +17,16 @@
 
 
 #include <Arduino.h>
-#include <avr/io.h>
-#include <util/delay.h>
+
 #include <avr/sleep.h>
-#include <stdlib.h>
-#include <string.h>
-#include <avr/eeprom.h>
-#include <avr/pgmspace.h>
+
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <math.h>
 #include <stdint.h>
 #include <avr/power.h>
+#include "TransistorTester.h"
 
-//#define LCD1602
-//#define LCD_I2C
-//#define NOK5110
-//#define OLED096
 #define OLED_I2C
 #define lcdU8
 
@@ -249,6 +242,8 @@
 #define TP2 1
 #define TP3 2
 #define TPext 3
+//
+// Reference voltage 2.5V
 // Port pin for 2.5V precision reference used for VCC check (optional)
 #define TPREF A6 // 19
 // Port pin for Battery voltage measuring
@@ -389,7 +384,7 @@
     #define MEM2_TEXT EEMEM
     #define MEM2_read_byte(a)  eeprom_read_byte(a)
     #define MEM2_read_word(a)  eeprom_read_word(a)
-    #define lcd_fix2_string(a)  lcd_fix_string(a)
+    #define lcd_fix2_string(a)  lcdFixString(a)
   #else
     #define MEM2_TEXT PROGMEM
     #define MEM2_read_byte(a)  pgm_read_byte(a)
@@ -408,7 +403,7 @@
 #define MEM_read_byte(a)  pgm_read_byte(a)
 #define MEM2_read_byte(a)  pgm_read_byte(a)
 #define MEM2_read_word(a)  pgm_read_word(a)
-#define lcd_fix2_string(a)  lcd_pgm_string(a)
+#define lcd_fix2_string(a)  lcdPgmString(a)
 #define use_lcd_pgm
 #endif
 
@@ -637,12 +632,14 @@
 
 
 #ifndef PIN_RP
-                                                                                                                        #define PIN_RP  220           // estimated internal resistance PORT to VCC
-                                // will only be used, if not set before in config.h
+
+#define PIN_RP  220           // estimated internal resistance PORT to VCC
+// will only be used, if not set before in config.h
 #endif
 #ifndef PIN_RM
-                                                                                                                        #define PIN_RM  190           // estimated internal resistance PORT to GND
-                                // will only be used, if not set before in config.h
+
+#define PIN_RM  190           // estimated internal resistance PORT to GND
+// will only be used, if not set before in config.h
 #endif
 
 //**********************************************************
@@ -717,8 +714,8 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #define AUTO_RH
 #else
 #ifdef AUTO_CAL
-    #define AUTO_RH
-  #endif
+#define AUTO_RH
+#endif
 #endif
 
 #undef CHECK_CALL
@@ -728,12 +725,12 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #endif
 
 #ifdef AUTO_CAL
-                                                                                                                        // AutoCheck Function is needed
-  #define CHECK_CALL
-  #define RR680PL resis680pl
-  #define RR680MI resis680mi
-  #define RRpinPL pin_rpl
-  #define RRpinMI pin_rmi
+// AutoCheck Function is needed
+#define CHECK_CALL
+#define RR680PL resis680pl
+#define RR680MI resis680mi
+#define RRpinPL pin_rpl
+#define RRpinMI pin_rmi
 #else
 #define RR680PL (R_L_VAL + PIN_RP)
 #define RR680MI (R_L_VAL + PIN_RM)
@@ -742,8 +739,8 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #endif
 
 #ifndef ESR_ZERO
-                                                                                                                        // define a default zero value for ESR measurement (0.01 Ohm units)
-  #define ESR_ZERO 20
+// define a default zero value for ESR measurement (0.01 Ohm units)
+#define ESR_ZERO 20
 #endif
 
 #ifndef RESTART_DELAY_TICS
@@ -757,19 +754,20 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 // with EBC_STYLE you can select the Pin-description in EBC= style instead of 123=??? style
 //#define EBC_STYLE
 #if EBC_STYLE == 123
-                                                                                                                        // unset the option for the 123 selection, since this style is default.
-  #undef EBC_STYLE
+// unset the option for the 123 selection, since this style is default.
+#undef EBC_STYLE
 #endif
 
 
 #if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
-#define LCD_CHAR_DIODE1 0x91
-#define LCD_CHAR_DIODE2 0x92
-#define LCD_CHAR_CAP    0x93
-#define LCD_CHAR_RESIS1 0x94
-#define LCD_CHAR_RESIS2 0x95
-#define LCD_CHAR_OMEGA  0x90
-#define LCD_CHAR_U      0xB5
+#define LCD_CHAR_DIODE1 0x91 // Diode-Icon; will be generated as custom character
+#define LCD_CHAR_DIODE2 0x92 // Diode-Icon; will be generated as custom character
+#define LCD_CHAR_CAP    0x93 // Capacitor-Icon;  will be generated as custom character
+// numbers of RESIS1 and RESIS2 are swapped for OLED display, which shows a corrupt RESIS1 character otherwise ???
+#define LCD_CHAR_RESIS1 0x94 // Resistor left part will be generated as custom character
+#define LCD_CHAR_RESIS2 0x95 // Resistor right part will be generated as custom character
+#define LCD_CHAR_OMEGA  0x90 // Omega-character
+#define LCD_CHAR_U      0xB5 // micro-characte
 
 #else
 // self build characters
@@ -815,7 +813,7 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 
 #define MAIN_C
 
-#if defined (MAIN_C)
+#if defined(MAIN_C)
 #define COMMON
 /*
   The voltage at a capacitor grows with  Uc = VCC * (1 - e**(-t/T))
@@ -856,26 +854,6 @@ const uint16_t RHtab[] PROGMEM = {954, 903, 856, 814, 775, 740, 707, 676, 648};
 
 // Strings in PROGMEM or in EEprom
 
-#if defined(LANG_GERMAN)        // deutsch
-                                                                                                                        const unsigned char TestRunning[] MEM_TEXT = "Testen...";
-   const unsigned char BatWeak[] MEM_TEXT = "gering";
-   const unsigned char BatEmpty[] MEM_TEXT = "leer!";
-   const unsigned char TestFailed2[] MEM_TEXT = "defektes ";
-   const unsigned char Component[] MEM_TEXT = "Bauteil";
-//   const unsigned char Diode[] MEM_TEXT = "Diode: ";
-   const unsigned char Triac[] MEM_TEXT = "Triac";
-   const unsigned char Thyristor[] MEM_TEXT = "Thyristor";
-   const unsigned char Unknown[] MEM_TEXT = " unbek.";
-   const unsigned char TestFailed1[] MEM_TEXT = "Kein,unbek. oder";
-   const unsigned char OrBroken[] MEM_TEXT = "oder defekt ";
-   const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
-   #define Cathode_char 'K'
- #ifdef WITH_SELFTEST
-   const unsigned char SELFTEST[] MEM_TEXT = "Selbsttest ..";
-   const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
-   const unsigned char ATE[] MEM_TEXT = "Test Ende";
- #endif
-#endif
 
 #if defined(LANG_ENGLISH)        // english
 const unsigned char TestRunning[] MEM_TEXT = "Testing...";
@@ -932,24 +910,6 @@ const unsigned char VLOSS_str[] MEM_TEXT = " Vloss=";
 const unsigned char Lis_str[] MEM_TEXT = "L=";
 const unsigned char Ir_str[] MEM_TEXT = "  Ir=";
 
-#ifndef WITH_UART
-//#define WITH_VEXT
-#endif
-#else
-
-#ifndef BAT_CHECK
-#ifndef WITH_UART
-//#define WITH_VEXT
-#endif
-#endif
-#endif
-
-#ifdef WITH_VEXT
-
-const unsigned char Vext_str[] MEM_TEXT = "Vext=";
-#define LCD_CLEAR
-#endif
-
 
 const unsigned char VERSION_str[] MEM2_TEXT = "T.Tester 1.08.4";
 
@@ -982,22 +942,13 @@ const unsigned char T50HZ[] MEM_TEXT = " 50Hz";
 #ifdef AUTO_CAL
 
 const unsigned char MinCap_str[] MEM2_TEXT = " >100nF";
-  const unsigned char REF_C_str[] MEM2_TEXT = "REF_C=";
-  const unsigned char REF_R_str[] MEM2_TEXT = "REF_R=";
+const unsigned char REF_C_str[] MEM2_TEXT = "REF_C=";
+const unsigned char REF_R_str[] MEM2_TEXT = "REF_R=";
 #endif
 
 #ifdef DebugOut
 #define LCD_CLEAR
 #endif
-
-
-const unsigned char DiodeIcon1[] MEM_TEXT = {0x11, 0x19, 0x1d, 0x1f, 0x1d, 0x19, 0x11, 0x00}; // Diode-Icon Anode left
-const unsigned char DiodeIcon2[] MEM_TEXT = {0x11, 0x13, 0x17, 0x1f, 0x17, 0x13, 0x11, 0x00}; // Diode-Icon Anode right
-const unsigned char CapIcon[]    MEM_TEXT = {0x1b, 0x1b, 0x1b, 0x1b, 0x1b, 0x1b, 0x1b, 0x00}; // Capacitor Icon
-const unsigned char ResIcon1[]   MEM_TEXT = {0x00, 0x0f, 0x08, 0x18, 0x08, 0x0f, 0x00, 0x00}; // Resistor Icon1 left
-const unsigned char ResIcon2[]   MEM_TEXT = {0x00, 0x1e, 0x02, 0x03, 0x02, 0x1e, 0x00, 0x00}; // Resistor Icon2 right
-const unsigned char OmegaIcon[]  MEM_TEXT = {0x00, 0x00, 0x0e, 0x11, 0x11, 0x0a, 0x1b, 0x00}; // Omega Icon
-const unsigned char MicroIcon[]  MEM_TEXT = {0x00, 0x00, 0x0a, 0x0a, 0x0a, 0x0e, 0x09, 0x10}; // Micro Icon
 
 const unsigned char PinRLtab[] PROGMEM = {(1 << (TP1 * 2)), (1 << (TP2 * 2)), (1
         << (TP3 * 2))};  // Table of commands to switch the  R-L resistors Pin 0,1,2
@@ -1015,18 +966,19 @@ const unsigned char PinADCtab[] PROGMEM = {(1 << TP1), (1 << TP2),
 */
 
 #ifdef AUTO_CAL
-                                                                                                                        //const uint16_t R680pl EEMEM = R_L_VAL+PIN_RP;	// total resistor to VCC
-  //const uint16_t R680mi EEMEM = R_L_VAL+PIN_RM;	// total resistor to GND
-  const int8_t RefDiff EEMEM = REF_R_KORR;		// correction of internal Reference Voltage
+//const uint16_t R680pl EEMEM = R_L_VAL+PIN_RP;	// total resistor to VCC
+//const uint16_t R680mi EEMEM = R_L_VAL+PIN_RM;	// total resistor to GND
+const int8_t RefDiff EEMEM = REF_R_KORR;        // correction of internal Reference Voltage
 #endif
 
 const uint8_t PrefixTab[] MEM_TEXT = {'p', 'n', LCD_CHAR_U, 'm', 0, 'k', 'M'};  // p,n,u,m,-,k,M
 
 #ifdef AUTO_CAL
-                                                                                                                        //const uint16_t cap_null EEMEM = C_NULL;	// Zero offset of capacity measurement
-  const int16_t ref_offset EEMEM = REF_C_KORR;	// default correction of internal reference voltage for capacity measurement
-  // LoPin:HiPin                        2:1    3:1    1:2                    :     3:2                   1:3    2:3
-  const uint8_t c_zero_tab[] EEMEM = { C_NULL,C_NULL,C_NULL+TP2_CAP_OFFSET,C_NULL,C_NULL+TP2_CAP_OFFSET,C_NULL,C_NULL }; // table of zero offsets
+//const uint16_t cap_null EEMEM = C_NULL;	// Zero offset of capacity measurement
+const int16_t ref_offset EEMEM = REF_C_KORR;    // default correction of internal reference voltage for capacity measurement
+// LoPin:HiPin                        2:1    3:1    1:2                    :     3:2                   1:3    2:3
+const uint8_t c_zero_tab[] EEMEM = {C_NULL, C_NULL, C_NULL + TP2_CAP_OFFSET, C_NULL, C_NULL + TP2_CAP_OFFSET, C_NULL,
+                                    C_NULL}; // table of zero offsets
 #endif
 
 const uint8_t EE_ESR_ZEROtab[] PROGMEM = {ESR_ZERO, ESR_ZERO, ESR_ZERO, ESR_ZERO};    // zero offset of ESR measurement
@@ -1146,11 +1098,11 @@ COMMON struct ADCconfig_t {
 } ADCconfig;
 
 #ifdef AUTO_CAL
-                                                                                                                        COMMON uint8_t pin_combination;	// coded Pin-combination  2:1,3:1,1:2,x:x,3:2,1:3,2:3
-  COMMON uint16_t resis680pl;	// port output resistance + 680
-  COMMON uint16_t resis680mi;	// port output resistance + 680
-  COMMON uint16_t pin_rmi;	// port output resistance to GND side, 0.1 Ohm units
-  COMMON uint16_t pin_rpl;	// port output resistance to VCC side, 0.1 Ohm units
+COMMON uint8_t pin_combination;    // coded Pin-combination  2:1,3:1,1:2,x:x,3:2,1:3,2:3
+COMMON uint16_t resis680pl;    // port output resistance + 680
+COMMON uint16_t resis680mi;    // port output resistance + 680
+COMMON uint16_t pin_rmi;    // port output resistance to GND side, 0.1 Ohm units
+COMMON uint16_t pin_rpl;    // port output resistance to VCC side, 0.1 Ohm units
 #endif
 
 #if POWER_OFF + 0 > 1
@@ -1241,10 +1193,10 @@ COMMON unsigned int display_time;	// display time of measurement in ms units
 #define CMD1_SetContrast         0x70     // set Contrast C3:C0 (instruction table 1, DOGM)
 
 // Makros for LCD
-#define lcd_line1() lcd_set_cursor(1,0)  // move to beginning of 1 row
-#define lcd_line2() lcd_set_cursor(2,0)  // move to beginning of 2 row
-#define lcd_line3() lcd_set_cursor(3,0)  // move to beginning of 3 row
-#define lcd_line4() lcd_set_cursor(4,0)  // move to beginning of 4 row
+#define lcd_line1() lcdCursor(1,0)  // move to beginning of 1 row
+#define lcd_line2() lcdCursor(2,0)  // move to beginning of 2 row
+#define lcd_line3() lcdCursor(3,0)  // move to beginning of 3 row
+#define lcd_line4() lcdCursor(4,0)  // move to beginning of 4 row
 
 #define uart_newline() Serial.println()
 
@@ -1310,27 +1262,6 @@ void setup() {
     pinMode(TestKeyPin, INPUT);
 
 
-#ifdef LCD1602
-                                                                                                                            #ifdef LCD_I2C
-      lcd.begin();
-    #else
-      lcd.begin(16,2);
-    #endif
-
-    lcd_pgm_custom_char(LCD_CHAR_DIODE1, DiodeIcon1);  // Custom-Character Diode symbol >|
-    lcd_pgm_custom_char(LCD_CHAR_DIODE2, DiodeIcon2);  // Custom-Character Diode symbol |<
-    lcd_pgm_custom_char(LCD_CHAR_CAP,    CapIcon);     // Custom-Character Capacitor symbol ||
-    lcd_pgm_custom_char(LCD_CHAR_RESIS1, ResIcon1);    // Custom-Character Resistor symbol [
-    lcd_pgm_custom_char(LCD_CHAR_RESIS2, ResIcon2);    // Custom-Character Resistor symbol ]
-    lcd_pgm_custom_char(LCD_CHAR_OMEGA,  OmegaIcon);   // load Omega as Custom-Character
-    lcd_pgm_custom_char(LCD_CHAR_U,      MicroIcon);   // load Micro as Custom-Character
-    lcd.home();
-
-    lcd_string("TransistorTester");
-    lcd_set_cursor(1, 0);
-    lcd_string("forArduino 1.08a");
-#endif
-
 #ifdef NOK5110
                                                                                                                             lcd.begin();
     lcd.cp437(true);
@@ -1359,13 +1290,13 @@ void setup() {
     u8g2.setFont(u8g_font_pro_ev);
 
 
-    lcd_string("Transistor");
-    lcd_set_cursor(1, 0);
-    lcd_string("Tester");
-    lcd_set_cursor(2, 0);
-    lcd_string("for Arduino");
-    lcd_set_cursor(3, 0);
-    lcd_string("1.08.2");
+    lcdFlashString(F("Transistor"));
+    lcdCursor(1, 0);
+    lcdFlashString(F("Tester"));
+    lcdCursor(2, 0);
+    lcdFlashString(F("for Arduino"));
+    lcdCursor(3, 0);
+    lcdFlashString(F("1.08.2"));
 //
 #endif
 
@@ -1446,7 +1377,7 @@ void setup() {
         // this happens, if the Watchdog is not reset for 2s
         // can happen, if any loop in the Program doen't finish.
         lcd_line1();
-        lcd_fix_string(TestTimedOut);    // Output Timeout
+        lcdFixString(TestTimedOut);    // Output Timeout
         wait_about2s();            // wait for 3 s
         //ON_PORT = 0;			// shut off!
         //ON_DDR = (1<<ON_PIN);		// switch to GND
@@ -1517,7 +1448,7 @@ void loop() {
         delay(100);
     }
 
-    lcd_clear();
+    lcdClear();
     delay(100);
 
     PartFound = PART_NONE;    // no part found
@@ -1555,7 +1486,7 @@ void loop() {
       //DisplayValue(cap.cval,-2,'V',2);		// Display 2 Digits of this 10mV units
       cap.cval = (trans.uBE[0]*4)+BAT_OUT;		// usually output only 2 digits
       DisplayValue(cap.cval,-3,'V',2);			// Display 2 Digits of this 10mV units
-      lcd_space();
+      lcdSpace();
     #endif
 
     #if (BAT_POOR > 12000)
@@ -1595,11 +1526,11 @@ void loop() {
 
       lcd_fix_string(BatWeak);		// Battery weak
     } else {                            // Battery-voltage OK
-      lcd_fix_string(OK_str); 		// "OK"
+      lcdFixString(OK_str); 		// "OK"
     }
 
 #else
-    lcd_fix2_string(VERSION_str);    // if no Battery check, Version .. in row 1
+    lcdPgmString(VERSION_str);    // if no Battery check, Version .. in row 1
 #endif
 
 #ifdef WDT_enabled
@@ -1620,10 +1551,10 @@ void loop() {
         if ((mess_count == 0) && (empty_count == 0)) {
             // display VCC= only first time
             lcd_line2();
-            lcd_fix_string(VCC_str);            // VCC=
-            lcd_space();
+            lcdFixString(VCC_str);            // VCC=
+            lcdSpace();
             DisplayValue(ADCconfig.U_AVCC, -3, 'V', 3);    // Display 3 Digits of this mV units
-            //lcd_space();
+            //lcdSpace();
             //DisplayValue(RRpinMI,-1,LCD_CHAR_OMEGA,4);
             wait_about1s();
         }
@@ -1636,7 +1567,7 @@ void loop() {
       lcd_line2();
       lcd_clear_line();
       lcd_line2();
-      lcd_fix_string(Vext_str);			// Vext=
+      lcdFixString(Vext_str);			// Vext=
       ADC_DDR = 0;				// deactivate Software-UART
       trans.uBE[1] = W5msReadADC(TPext);	// read external voltage
       ADC_DDR = TXD_MSK;			// activate Software-UART
@@ -1651,7 +1582,7 @@ void loop() {
 #endif
 
     lcd_line3();            // LCD position row 2, column 1
-    lcd_fix_string(TestRunning);    // String: testing...
+    lcdFixString(TestRunning);    // String: testing...
 
 #ifndef DebugOut
     lcd_line2();        // LCD position row 2, column 1
@@ -1674,8 +1605,8 @@ void loop() {
     EntladePins();        // discharge all capacitors!
 
     if (PartFound == PART_CELL) {
-        lcd_clear();
-        lcd_fix_string(Cell_str);    // display "Cell!"
+        lcdClear();
+        lcdFixString(Cell_str);    // display "Cell!"
         goto end2;
     }
 
@@ -1708,11 +1639,11 @@ void loop() {
     }
 
     // All checks are done, output result to display
-    lcd_clear();
+    lcdClear();
 
     if (PartFound == PART_DIODE) {
         if (NumOfDiodes == 1) {        // single Diode
-            //lcd_fix_string(Diode);		// "Diode: "
+            //lcdFixString(Diode);		// "Diode: "
 
 #if FLASHEND > 0x1fff
             // enough memory to sort the pins
@@ -1725,26 +1656,26 @@ void loop() {
             lcd_testpin(diodes[0].Cathode);
           } else {
             lcd_testpin(diodes[0].Cathode);
-            lcd_fix_string(KatAn);          // "-|<-"
+            lcdFixString(KatAn);          // "-|<-"
             lcd_testpin(diodes[0].Anode);
           }
 #else
             // the higher test pin number is right side
             if (diodes[0].Anode < diodes[0].Cathode) {
-                lcd_testpin(diodes[0].Anode);
-                lcd_fix_string(AnKat);          // "->|-"
-                lcd_testpin(diodes[0].Cathode);
+                lcdTestPin(diodes[0].Anode);
+                lcdFixString(AnKat);          // "->|-"
+                lcdTestPin(diodes[0].Cathode);
             } else {
-                lcd_testpin(diodes[0].Cathode);
-                lcd_fix_string(KatAn);          // "-|<-"
-                lcd_testpin(diodes[0].Anode);
+                lcdTestPin(diodes[0].Cathode);
+                lcdFixString(KatAn);          // "-|<-"
+                lcdTestPin(diodes[0].Anode);
             }
 #endif
 
 #else
                                                                                                                                     // too less memory to sort the pins
         lcd_testpin(diodes[0].Anode);
-        lcd_fix_string(AnKat);          // "->|-"
+        lcdFixString(AnKat);          // "->|-"
         lcd_testpin(diodes[0].Cathode);
 #endif
 
@@ -1759,40 +1690,40 @@ void loop() {
 #endif
 
             // load current of capacity is (5V-1.1V)/(470000 Ohm) = 8298nA
-            lcd_fix_string(GateCap_str);            // "C="
+            lcdFixString(GateCap_str);            // "C="
             ReadCapacity(diodes[0].Cathode, diodes[0].Anode);    // Capacity opposite flow direction
             DisplayValue(cap.cval, cap.cpre, 'F', 3);
             goto end;
 
         } else if (NumOfDiodes == 2) {    // double diode
-            lcd_data('2');
-            lcd_fix_string(Diodes);        // "diodes "
+            lcdFlashString(F("2"));
+            lcdFixString(Diodes);        // "diodes "
 
             if (diodes[0].Anode == diodes[1].Anode) { //Common Anode
-                lcd_testpin(diodes[0].Cathode);
-                lcd_fix_string(KatAn);          // "-|<-"
-                lcd_testpin(diodes[0].Anode);
-                lcd_fix_string(AnKat);          // "->|-"
-                lcd_testpin(diodes[1].Cathode);
+                lcdTestPin(diodes[0].Cathode);
+                lcdFixString(KatAn);          // "-|<-"
+                lcdTestPin(diodes[0].Anode);
+                lcdFixString(AnKat);          // "->|-"
+                lcdTestPin(diodes[1].Cathode);
                 UfOutput(0x01);
                 goto end;
 
             } else if (diodes[0].Cathode == diodes[1].Cathode) { //Common Cathode
-                lcd_testpin(diodes[0].Anode);
-                lcd_fix_string(AnKat);          // "->|-"
-                lcd_testpin(diodes[0].Cathode);
-                lcd_fix_string(KatAn);          // "-|<-"
-                lcd_testpin(diodes[1].Anode);
+                lcdTestPin(diodes[0].Anode);
+                lcdFixString(AnKat);          // "->|-"
+                lcdTestPin(diodes[0].Cathode);
+                lcdFixString(KatAn);          // "-|<-"
+                lcdTestPin(diodes[1].Anode);
                 UfOutput(0x01);
                 goto end;
 
             } else if ((diodes[0].Cathode == diodes[1].Anode) && (diodes[1].Cathode == diodes[0].Anode)) {
                 // Antiparallel
-                lcd_testpin(diodes[0].Anode);
-                lcd_fix_string(AnKat);          // "->|-"
-                lcd_testpin(diodes[0].Cathode);
-                lcd_fix_string(AnKat);          // "->|-"
-                lcd_testpin(diodes[1].Cathode);
+                lcdTestPin(diodes[0].Anode);
+                lcdFixString(AnKat);          // "->|-"
+                lcdTestPin(diodes[0].Cathode);
+                lcdFixString(AnKat);          // "->|-"
+                lcdTestPin(diodes[1].Cathode);
                 UfOutput(0x01);
                 goto end;
             }
@@ -1836,31 +1767,31 @@ void loop() {
         lcd_testpin(diodes[0].Anode);
         lcd_data(':');
         lcd_testpin(diodes[0].Cathode);
-        lcd_space();
+        lcdSpace();
         lcd_string(utoa(diodes[0].Voltage, outval, 10));
-        lcd_space();
+        lcdSpace();
         lcd_testpin(diodes[1].Anode);
-        lcd_data(':');
+        lcdData(':');
         lcd_testpin(diodes[1].Cathode);
-        lcd_space();
+        lcdSpace();
         lcd_string(utoa(diodes[1].Voltage, outval, 10));
         lcd_line4();
         lcd_testpin(diodes[2].Anode);
         lcd_data(':');
         lcd_testpin(diodes[2].Cathode);
-        lcd_space();
+        lcdSpace();
         lcd_string(utoa(diodes[2].Voltage, outval, 10));
         lcd_line1();
 #endif
 
             if ((trans.b < 3) && (trans.c < 3)) {
-                lcd_data('3');
-                lcd_fix_string(Diodes);            // "Diodes "
-                lcd_testpin(diodes[trans.b].Anode);
-                lcd_fix_string(AnKat);            // "->|-"
-                lcd_testpin(diodes[trans.b].Cathode);
-                lcd_fix_string(AnKat);            // "->|-"
-                lcd_testpin(diodes[trans.c].Cathode);
+                lcdFlashString(F("3"));
+                lcdFixString(Diodes);            // "Diodes "
+                lcdTestPin(diodes[trans.b].Anode);
+                lcdFixString(AnKat);            // "->|-"
+                lcdTestPin(diodes[trans.b].Cathode);
+                lcdFixString(AnKat);            // "->|-"
+                lcdTestPin(diodes[trans.c].Cathode);
                 UfOutput((trans.b << 4) | trans.c);
                 goto end;
             }
@@ -1881,9 +1812,9 @@ void loop() {
         }
 
         if (PartMode == PART_MODE_NPN) {
-            lcd_fix_string(NPN_str);        // "NPN "
+            lcdFixString(NPN_str);        // "NPN "
         } else {
-            lcd_fix_string(PNP_str);        // "PNP "
+            lcdFixString(PNP_str);        // "PNP "
         }
 
         if (NumOfDiodes > 2) {    // Transistor with protection diode
@@ -1902,9 +1833,9 @@ void loop() {
                 ((PartMode != PART_MODE_NPN) && (trans.c < trans.e)))
 #endif
             {
-                lcd_fix_string(AnKat);  // "->|-"
+                lcdFixString(AnKat);  // "->|-"
             } else {
-                lcd_fix_string(KatAn);  // "-|<-"
+                lcdFixString(KatAn);  // "-|<-"
             }
         }
 
@@ -1920,15 +1851,15 @@ void loop() {
         lcd_line2();  // 2 row
 #endif
 
-        lcd_fix_string(hfe_str);        // "B="  (hFE)
+        lcdFixString(hfe_str);        // "B="  (hFE)
         DisplayValue(trans.hfe[0], 0, 0, 3);
-        lcd_space();
+        lcdSpace();
 
 #if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
         lcd_line4();
 #endif
 
-        lcd_fix_string(Uf_str);        // "Uf="
+        lcdFixString(Uf_str);        // "Uf="
         DisplayValue(trans.uBE[0], -3, 'V', 3);
         goto end;
 
@@ -1937,24 +1868,24 @@ void loop() {
     } else if (PartFound == PART_FET) {    // JFET or MOSFET
 
         if (PartMode & 1) {
-            lcd_data('P');            // P-channel
+            lcdFlashString(F("P"));            // P-channel
         } else {
-            lcd_data('N');            // N-channel
+            lcdFlashString(F("N"));            // N-channel
         }
-        lcd_data('-');
+        lcdFlashString(F("-"));
 
         tmp = PartMode / 2;
         if (tmp == (PART_MODE_N_D_MOS / 2)) {
-            lcd_data('D');            // N-D
+            lcdFlashString(F("D"));             // N-D
         }
         if (tmp == (PART_MODE_N_E_MOS / 2)) {
-            lcd_data('E');            // N-E
+            lcdFlashString(F("E"));             // N-E
         }
 
         if (tmp == (PART_MODE_N_JFET / 2)) {
-            lcd_fix_string(jfet_str);         // "JFET"
+            lcdFixString(jfet_str);         // "JFET"
         } else {
-            lcd_fix_string(mosfet_str);       // "-MOS "
+            lcdFixString(mosfet_str);       // "-MOS "
         }
 
 #if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
@@ -1979,21 +1910,21 @@ void loop() {
             if (((PartMode & 1) && (trans.c < trans.e)) || ((!(PartMode & 1)) && (trans.c > trans.e)))
 #endif
             {
-                lcd_data(LCD_CHAR_DIODE1);    // show Diode symbol >|
+                lcdData(LCD_CHAR_DIODE1);    // show Diode symbol >|
             } else {
-                lcd_data(LCD_CHAR_DIODE2);    // show Diode symbol |<
+                lcdData(LCD_CHAR_DIODE2);    // show Diode symbol |<
             }
         }
 
 #if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
-            lcd_line3();
+        lcd_line3();
 #else
         lcd_line2();  // 2 row
 #endif
 
         if (PartMode < PART_MODE_N_D_MOS) {        // enhancement-MOSFET
             // Gate capacity
-            lcd_fix_string(GateCap_str);        // "C="
+            lcdFixString(GateCap_str);        // "C="
             ReadCapacity(trans.b, trans.e);        // measure capacity
             DisplayValue(cap.cval, cap.cpre, 'F', 3);
 
@@ -2001,17 +1932,17 @@ void loop() {
             lcd_line4();
 #endif
 
-            lcd_fix_string(vt_str);            // "Vt="
+            lcdFixString(vt_str);            // "Vt="
         } else {
-            lcd_data('I');
-            lcd_data('=');
+            lcdFlashString(F("I"));
+            lcdFlashString(F("="));
             DisplayValue(trans.uBE[1], -5, 'A', 2);
 
 #if  defined(NOK5110) || defined(OLED096) || defined(lcdU8)
             lcd_line4();
 #endif
 
-            lcd_fix_string(Vgs_str);            // " Vgs="
+            lcdFixString(Vgs_str);            // " Vgs="
         }
 
         // Gate-threshold voltage
@@ -2021,18 +1952,18 @@ void loop() {
         // end (PartFound == PART_FET)
 
     } else if (PartFound == PART_THYRISTOR) {
-        lcd_fix_string(Thyristor);            // "Thyristor"
+        lcdFixString(Thyristor);            // "Thyristor"
         goto gakOutput;
 
     } else if (PartFound == PART_TRIAC) {
-        lcd_fix_string(Triac);            // "Triac"
+        lcdFixString(Triac);            // "Triac"
         goto gakOutput;
 
     } else if (PartFound == PART_RESISTOR) {
         if (ResistorsFound == 1) {            // single resistor
-            lcd_testpin(resis[0].rb);            // Pin-number 1
-            lcd_fix_string(Resistor_str);
-            lcd_testpin(resis[0].ra);            // Pin-number 2
+            lcdTestPin(resis[0].rb);            // Pin-number 1
+            lcdFixString(Resistor_str);
+            lcdTestPin(resis[0].ra);            // Pin-number 2
         } else {                    // R-Max suchen
             ii = 0;
             if (resis[1].rx > resis[0].rx)
@@ -2061,11 +1992,11 @@ void loop() {
                 z = '3';
             }
 
-            lcd_data(x);
-            lcd_fix_string(Resistor_str);    // "-[=]-"
-            lcd_data(y);
-            lcd_fix_string(Resistor_str);    // "-[=]-"
-            lcd_data(z);
+            lcdData(x);
+            lcdFixString(Resistor_str);    // "-[=]-"
+            lcdData(y);
+            lcdFixString(Resistor_str);    // "-[=]-"
+            lcdData(z);
         }
 
         lcd_line2();  // 2 row
@@ -2081,7 +2012,7 @@ void loop() {
                 lcd_line3();
 #endif
 
-                lcd_fix_string(Lis_str);                // "L="
+                lcdFixString(Lis_str);                // "L="
                 DisplayValue(resis[0].lx, resis[0].lpre, 'H', 3);    // output inductance
             }
 #endif
@@ -2107,10 +2038,10 @@ void loop() {
 
         // capacity measurement is wanted
     } else if (PartFound == PART_CAPACITOR) {
-        //lcd_fix_string(Capacitor);
-        lcd_testpin(cap.ca);        // Pin number 1
-        lcd_fix_string(CapZeich);        // capacitor sign
-        lcd_testpin(cap.cb);        // Pin number 2
+        //lcdFixString(Capacitor);
+        lcdTestPin(cap.ca);        // Pin number 1
+        lcdFixString(CapZeich);        // capacitor sign
+        lcdTestPin(cap.cb);        // Pin number 2
 
 #if FLASHEND > 0x1fff
         GetVloss();            // get Voltage loss of capacitor
@@ -2120,7 +2051,7 @@ void loop() {
             lcd_line4();
 #endif
 
-            lcd_fix_string(VLOSS_str);    // "  Vloss="
+            lcdFixString(VLOSS_str);    // "  Vloss="
             DisplayValue(cap.v_loss, -1, '%', 2);
         }
 #endif
@@ -2136,7 +2067,7 @@ void loop() {
             lcd_line3();
 #endif
 
-            lcd_fix_string(ESR_str);
+            lcdFixString(ESR_str);
             DisplayValue(cap.esr, -2, LCD_CHAR_OMEGA, 2);
         }
 #endif
@@ -2145,17 +2076,17 @@ void loop() {
     }
 
     if (NumOfDiodes == 0) {        // no diodes are found
-        lcd_fix_string(TestFailed1);    // "No, unknown, or"
+        lcdFixString(TestFailed1);    // "No, unknown, or"
         lcd_line2();            // 2 row
-        lcd_fix_string(TestFailed2);    // "damaged "
-        lcd_fix_string(Component);        // "part"
+        lcdFixString(TestFailed2);    // "damaged "
+        lcdFixString(Component);        // "part"
     } else {
-        lcd_fix_string(Component);        // "part"
-        lcd_fix_string(Unknown);        // " unknown"
+        lcdFixString(Component);        // "part"
+        lcdFixString(Unknown);        // " unknown"
         lcd_line2();            // 2 row
-        lcd_fix_string(OrBroken);        // "or damaged "
-        lcd_data(NumOfDiodes + '0');
-        lcd_fix_string(AnKat);        // "->|-"
+        lcdFixString(OrBroken);        // "or damaged "
+        lcdData(NumOfDiodes + '0');
+        lcdFixString(AnKat);        // "->|-"
     }
 
     empty_count++;
@@ -2232,7 +2163,7 @@ void loop() {
 // if number >= 3  no output is done
 void UfOutput(uint8_t bcdnum) {
     lcd_line2();                // 2 row
-    lcd_fix_string(Uf_str);        // "Uf="
+    lcdFixString(Uf_str);        // "Uf="
     mVOutput(bcdnum >> 4);
     mVOutput(bcdnum & 0x0f);
 }
@@ -2241,7 +2172,7 @@ void mVOutput(uint8_t nn) {
     if (nn < 3) {
         // Output in mV units
         DisplayValue(diodes[nn].Voltage, -3, 'V', 3);
-        lcd_space();
+        lcdSpace();
     }
 }
 
@@ -2260,7 +2191,7 @@ void RvalOut(uint8_t ii) {
     DisplayValue(resis[ii].rx,-1,LCD_CHAR_OMEGA,4);
 #endif
 
-    lcd_space();
+    lcdSpace();
 }
 
 //******************************************************************
@@ -2385,7 +2316,7 @@ void RefVoltage(void) {
     uint8_t tabres;
 
 #ifdef AUTO_CAL
-    referenz = ref_mv + (int16_t)eeprom_read_word((uint16_t *)(&ref_offset));
+    referenz = ref_mv + (int16_t) eeprom_read_word((uint16_t *) (&ref_offset));
 #else
     referenz = ref_mv + REF_C_KORR;
 #endif
@@ -2419,7 +2350,7 @@ void lcd_clear_line(void) {
     // writes 20 spaces to LCD-Display, Cursor must be positioned to first column
     unsigned char ll;
     for (ll = 0; ll < 20; ll++) {
-        lcd_space();
+        lcdSpace();
     }
 }
 
@@ -2493,17 +2424,17 @@ void DisplayValue(unsigned long Value, int8_t Exponent, unsigned char Unit, unsi
     if (Exponent <= 0)            // we have to prepend "0."
     {
         // 0: factor 10 / -1: factor 100
-        //lcd_data('0');
-        lcd_data('.');
+        //lcdData('0');
+        lcdData('.');
 
 #ifdef NO_NANO
                                                                                                                                 while (Exponent < 0)
         {
-          lcd_data('0');		// extra 0 for factor 10
+          lcdData('0');		// extra 0 for factor 10
           Exponent++;
         }
 #else
-        if (Exponent < 0) lcd_data('0');    // extra 0 for factor 100
+        if (Exponent < 0) lcdData('0');    // extra 0 for factor 100
 #endif
     }
 
@@ -2516,16 +2447,16 @@ void DisplayValue(unsigned long Value, int8_t Exponent, unsigned char Unit, unsi
     Index = 0;
     while (Index < Length)        // loop through string
     {
-        lcd_data(OutBuffer[Index]);        // display char
+        lcdData(OutBuffer[Index]);        // display char
         Index++;                // next one
         if (Index == Exponent) {
-            lcd_data('.');            // display dot
+            lcdData('.');            // display dot
         }
     }
 
     // display prefix and unit
-    if (Prefix != 0) lcd_data(Prefix);
-    if (Unit) lcd_data(Unit);
+    if (Prefix != 0) lcdData(Prefix);
+    if (Unit) lcdData(Unit);
 }
 
 
@@ -2578,16 +2509,16 @@ void PinLayout(char pin1, char pin2, char pin3) {
     // pin1-3 is EBC or SGD or CGA
 #ifndef EBC_STYLE
     // Layout with 123= style
-    lcd_fix_string(N123_str);            // " 123="
+    lcdFixString(N123_str);            // " 123="
     for (ii = 0; ii < 3; ii++) {
-        if (ii == trans.e) lcd_data(pin1);    // Output Character in right order
-        if (ii == trans.b) lcd_data(pin2);
-        if (ii == trans.c) lcd_data(pin3);
+        if (ii == trans.e) lcdData(pin1);    // Output Character in right order
+        if (ii == trans.b) lcdData(pin2);
+        if (ii == trans.c) lcdData(pin3);
     }
 #else
                                                                                                                             #if EBC_STYLE == 321
       // Layout with 321= style
-      lcd_fix_string(N321_str);			// " 321="
+      lcdFixString(N321_str);			// " 321="
       ii = 3;
       while (ii != 0) {
         ii--;
@@ -2597,11 +2528,11 @@ void PinLayout(char pin1, char pin2, char pin3) {
       }
     #else
       // Layout with EBC= style
-      lcd_space();
+      lcdSpace();
       lcd_data(pin1);
       lcd_data(pin2);
       lcd_data(pin3);
-      lcd_data('=');
+      lcdData('=');
       lcd_testpin(trans.e);
       lcd_testpin(trans.b);
       lcd_testpin(trans.c);
@@ -2623,11 +2554,11 @@ void AutoCheck(void) {
 #define MAX_REP 4
 
 #ifdef AUTO_CAL
-    uint8_t cap_found;	// counter for found capacitor
+    uint8_t cap_found;    // counter for found capacitor
 
 #ifdef AUTOSCALE_ADC
-      int8_t udiff;		// difference between ADC Voltage with VCC or Bandgap reference
-      int8_t udiff2;
+    int8_t udiff;        // difference between ADC Voltage with VCC or Bandgap reference
+    int8_t udiff2;
 #endif
 #endif
 
@@ -2638,8 +2569,8 @@ void AutoCheck(void) {
 
     if (AllProbesShorted() != 3) return;
 
-    lcd_clear();
-    lcd_fix_string(SELFTEST);        // "Selftest mode.."
+    lcdClear();
+    lcdFixString(SELFTEST);        // "Selftest mode.."
 
     lcd_line2();
     lcd_fix2_string(R0_str);        // "R0="
@@ -2684,9 +2615,9 @@ void AutoCheck(void) {
             lcd_line1();            // Cursor to column 1, row 1
             lcd_clear_line();            // clear total line
             lcd_line1();            // Cursor to column 1, row 1
-            lcd_data('T');            // output the Testmode "T"
-            lcd_string(utoa(tt, outval, 10));    // output Test number
-            lcd_space();
+            lcdData('T');            // output the Testmode "T"
+            lcdString(utoa(tt, outval, 10));    // output Test number
+            lcdSpace();
 
             if (tt == 1) {        // output of reference voltage and factors for capacity measurement
                 Calibrate_UR();        // get Reference voltage, Pin resistance
@@ -2694,7 +2625,7 @@ void AutoCheck(void) {
                 DisplayValue(ref_mv, -3, 'V', 4);
                 lcd_line2();                // Cursor to column 1, row 2
                 lcd_fix2_string(RHfakt);        // "RHf="
-                lcd_string(utoa(RHmultip, outval, 10));
+                lcdString(utoa(RHmultip, outval, 10));
                 ADCconfig.Samples = 190;        // set number of ADC reads near to maximum
             }
 
@@ -2711,7 +2642,7 @@ void AutoCheck(void) {
                 R_DDR = (1 << (TP2 * 2)) | (1 << (TP3 * 2));    // RL3 to -
                 adcmv[2] = W20msReadADC(TP2);
                 adcmv[2] -= u680;
-                lcd_fix_string(RLRL);            // "RLRL"
+                lcdFixString(RLRL);            // "RLRL"
             }
 
             if (tt == 3) {    // how equal are the RH resistors
@@ -2727,11 +2658,11 @@ void AutoCheck(void) {
                 R_DDR = (2 << (TP2 * 2)) | (2 << (TP3 * 2));    // RH3 to -
                 adcmv[2] = W20msReadADC(TP2);
                 adcmv[2] -= adcmv[3];
-                lcd_fix_string(RHRH);            // "RHRH"
+                lcdFixString(RHRH);            // "RHRH"
             }
 
             if (tt == 4) {    // Text release probes
-                lcd_fix_string(RELPROBE);        // "Release Probes"
+                lcdFixString(RELPROBE);        // "Release Probes"
                 if (AllProbesShorted() != 0) ww = MAX_REP - 2;
             }
 
@@ -2745,7 +2676,7 @@ void AutoCheck(void) {
 
                 R_DDR = 2 << (TP3 * 2);        // Pin 3 over R_H to GND
                 adcmv[2] = W20msReadADC(TP3);
-                lcd_fix_string(RH1L);        // "RH_Lo="
+                lcdFixString(RH1L);        // "RH_Lo="
             }
 
             if (tt == 6) {    // can we switch the ADC pins to VCC across the R_H resistor?
@@ -2758,7 +2689,7 @@ void AutoCheck(void) {
                 R_DDR = 2 << (TP3 * 2);        // Pin 3 over R_H to VCC
                 R_PORT = 2 << (TP3 * 2);
                 adcmv[2] = W20msReadADC(TP3) - ADCconfig.U_AVCC;
-                lcd_fix_string(RH1H);        // "RH_Hi="
+                lcdFixString(RH1H);        // "RH_Hi="
             }
 
             if (tt == 7) {    // can we switch the ADC pins to VCC across the R_H resistor?
@@ -2775,16 +2706,16 @@ void AutoCheck(void) {
                 R_DDR = (2 << (TP3 * 2)) | (1 << (TP3 * 2));    // RH3 to +, RL3 to -
                 adcmv[2] = W20msReadADC(TP3);
                 adcmv[2] -= u680;
-                lcd_fix_string(RHRL);            // "RH/RL"
+                lcdFixString(RHRL);            // "RH/RL"
             }
 
             if (tt > 1) {    // output 3 voltages
                 lcd_line2();                // Cursor to column 1, row 2
-                lcd_string(itoa(adcmv[0], outval, 10));    // output voltage 1
-                lcd_space();
-                lcd_string(itoa(adcmv[1], outval, 10));    // output voltage 2
-                lcd_space();
-                lcd_string(itoa(adcmv[2], outval, 10));    // output voltage 3
+                lcdString(itoa(adcmv[0], outval, 10));    // output voltage 1
+                lcdSpace();
+                lcdString(itoa(adcmv[1], outval, 10));    // output voltage 2
+                lcdSpace();
+                lcdString(itoa(adcmv[2], outval, 10));    // output voltage 3
             }
 
             ADC_DDR = TXD_MSK;        // all-Pins to Input
@@ -2809,11 +2740,11 @@ void AutoCheck(void) {
 
     }  // end for tt
 
-    lcd_clear();
-    lcd_fix_string(RIHI);                // "RiHi="
+    lcdClear();
+    lcdFixString(RIHI);                // "RiHi="
     DisplayValue(RRpinPL, -1, LCD_CHAR_OMEGA, 3);
     lcd_line2();
-    lcd_fix_string(RILO);                // "RiLo="
+    lcdFixString(RILO);                // "RiLo="
     DisplayValue(RRpinMI, -1, LCD_CHAR_OMEGA, 3);
     wait_about2s();
 
@@ -2833,26 +2764,27 @@ void AutoCheck(void) {
     ReadCapacity(TP1, TP2);
     adcmv[0] = (unsigned int) cap.cval_uncorrected.dw;    // save capacity value of empty Pin 2:1
 
-    lcd_clear();
-    lcd_fix_string(C0_str);            // output "C0 "
+    lcdClear();
+    lcdFixString(C0_str);            // output "C0 "
     DisplayValue(adcmv[5], 0, ' ', 3);        // output cap0 1:3
     DisplayValue(adcmv[6], 0, ' ', 3);        // output cap0 2:3
     DisplayValue(adcmv[2], -12, 'F', 3);        // output cap0 1:2
 
 #ifdef AUTO_CAL
-    for (ww=0;ww<7;ww++) {
-      if (adcmv[ww] > 70) goto no_c0save;
+    for (ww = 0; ww < 7; ww++) {
+        if (adcmv[ww] > 70) goto no_c0save;
     }
 
-    for (ww=0;ww<7;ww++) {
-      // write all zero offsets to the EEprom
-      (void) eeprom_write_byte((uint8_t *)(&c_zero_tab[ww]),adcmv[ww]+(COMP_SLEW1 / (CC0 + CABLE_CAP + COMP_SLEW2)));
+    for (ww = 0; ww < 7; ww++) {
+        // write all zero offsets to the EEprom
+        (void) eeprom_write_byte((uint8_t *) (&c_zero_tab[ww]),
+                                 adcmv[ww] + (COMP_SLEW1 / (CC0 + CABLE_CAP + COMP_SLEW2)));
     }
 
     lcd_line2();
-    lcd_fix_string(OK_str);		// output "OK"
+    lcdFixString(OK_str);        // output "OK"
 
-no_c0save:
+    no_c0save:
 #endif
 
     wait_about2s();
@@ -2860,121 +2792,124 @@ no_c0save:
 #ifdef AUTO_CAL
     // Message C > 100nF
     cap_found = 0;
-    for (ww=0; ww<64; ww++) {
-      lcd_clear();
-      lcd_data('1');
-      lcd_fix_string(CapZeich);		// "-||-"
-      lcd_data('3');
-      lcd_fix2_string(MinCap_str);	// " >100nF!"
+    for (ww = 0; ww < 64; ww++) {
+        lcdClear();
+        lcdData('1');
+        lcdFixString(CapZeich);        // "-||-"
+        lcdData('3');
+        lcd_fix2_string(MinCap_str);    // " >100nF!"
 
-      PartFound = PART_NONE;
-      // measure  offset Voltage of analog Comparator for Capacity measurement
-      ReadCapacity(TP3, TP1);		// look for capacitor > 100nF
+        PartFound = PART_NONE;
+        // measure  offset Voltage of analog Comparator for Capacity measurement
+        ReadCapacity(TP3, TP1);        // look for capacitor > 100nF
 
-      while (cap.cpre < -9) {
-        cap.cpre++;
-        cap.cval /= 10;
-      }
+        while (cap.cpre < -9) {
+            cap.cpre++;
+            cap.cval /= 10;
+        }
 
-      if ((cap.cpre == -9) && (cap.cval > 95) && (cap.cval < 22000)) {
-        cap_found++;
-      } else {
-        cap_found = 0;		// wait for stable connection
-      }
+        if ((cap.cpre == -9) && (cap.cval > 95) && (cap.cval < 22000)) {
+            cap_found++;
+        } else {
+            cap_found = 0;        // wait for stable connection
+        }
 
-      if (cap_found > 1) {
-        // value of capacitor is correct
-        (void) eeprom_write_word((uint16_t *)(&ref_offset), load_diff);	// hold zero offset + slew rate dependend offset
-        lcd_clear();
-        lcd_fix2_string(REF_C_str);			// "REF_C="
-        lcd_string(itoa(load_diff, outval, 10));	// output REF_C_KORR
+        if (cap_found > 1) {
+            // value of capacitor is correct
+            (void) eeprom_write_word((uint16_t *) (&ref_offset),
+                                     load_diff);    // hold zero offset + slew rate dependend offset
+            lcdClear();
+            lcd_fix2_string(REF_C_str);            // "REF_C="
+            lcdString(itoa(load_diff, outval, 10));    // output REF_C_KORR
 
 #if 0
-          // Test for switching level of the digital input of port TP3
+            // Test for switching level of the digital input of port TP3
 
-          for (ii=0;ii<8;ii++) {
-            ADC_PORT =  TXD_VAL;		// ADC-Port 1 to GND
-            ADC_DDR = 1<<TP1 | TXD_MSK;		// ADC-Pin  1 to output 0V
-            R_PORT = 2<<(TP3*2);		// Pin 3 over R_H to VCC
-            R_DDR = 2<<(TP3*2);			// Pin 3 over R_H to VCC
+            for (ii=0;ii<8;ii++) {
+              ADC_PORT =  TXD_VAL;		// ADC-Port 1 to GND
+              ADC_DDR = 1<<TP1 | TXD_MSK;		// ADC-Pin  1 to output 0V
+              R_PORT = 2<<(TP3*2);		// Pin 3 over R_H to VCC
+              R_DDR = 2<<(TP3*2);			// Pin 3 over R_H to VCC
 
-            while (1) {
-              wdt_reset();
-              if ((ADC_PIN&(1<<TP3)) == (1<<TP3)) break;
+              while (1) {
+                wdt_reset();
+                if ((ADC_PIN&(1<<TP3)) == (1<<TP3)) break;
+              }
+
+              R_DDR = 0;				// Pin 3 without current
+              R_PORT = 0;
+              adcmv[0] = ReadADC(TP3);
+              lcd_line3();
+              DisplayValue(adcmv[0],-3,'V',4);
+              R_DDR = 2<<(TP3*2);			// Pin 3 over R_H to GND
+
+              while (1) {
+                wdt_reset();
+                if ((ADC_PIN&(1<<TP3)) != (1<<TP3)) break;
+              }
+
+              R_DDR = 0;				// Pin 3 without current
+              lcd_line4();
+              adcmv[0] = ReadADC(TP3);
+              DisplayValue(adcmv[0],-3,'V',4);
+              wait_about1s();
             }
-
-            R_DDR = 0;				// Pin 3 without current
-            R_PORT = 0;
-            adcmv[0] = ReadADC(TP3);
-            lcd_line3();
-            DisplayValue(adcmv[0],-3,'V',4);
-            R_DDR = 2<<(TP3*2);			// Pin 3 over R_H to GND
-
-            while (1) {
-              wdt_reset();
-              if ((ADC_PIN&(1<<TP3)) != (1<<TP3)) break;
-            }
-
-            R_DDR = 0;				// Pin 3 without current
-            lcd_line4();
-            adcmv[0] = ReadADC(TP3);
-            DisplayValue(adcmv[0],-3,'V',4);
-            wait_about1s();
-          }
 #endif
 
 #ifdef AUTOSCALE_ADC
-          ADC_PORT =  TXD_VAL;			// ADC-Port 1 to GND
-          ADC_DDR = 1<<TP1 | TXD_MSK;		// ADC-Pin  1 to output 0V
-          R_DDR = 2<<(TP3*2);			// Pin 3 over R_H to GND
+            ADC_PORT = TXD_VAL;            // ADC-Port 1 to GND
+            ADC_DDR = 1 << TP1 | TXD_MSK;        // ADC-Pin  1 to output 0V
+            R_DDR = 2 << (TP3 * 2);            // Pin 3 over R_H to GND
 
-          do {
-            adcmv[0] = ReadADC(TP3);
-          } while (adcmv[0] > 980);
+            do {
+                adcmv[0] = ReadADC(TP3);
+            } while (adcmv[0] > 980);
 
-          R_DDR = 0;				// all Pins to input
+            R_DDR = 0;                // all Pins to input
 
-          ADCconfig.U_Bandgap = 0;		// do not use internal Ref
-          adcmv[0] = ReadADC(TP3);  		// get cap voltage with VCC reference
-          ADCconfig.U_Bandgap = ADC_internal_reference;
-          adcmv[1] = ReadADC(TP3);		// get cap voltage with internal reference
-          ADCconfig.U_Bandgap = 0;		// do not use internal Ref
-          adcmv[2] = ReadADC(TP3);  		// get cap voltage with VCC reference
-          ADCconfig.U_Bandgap = ADC_internal_reference;
+            ADCconfig.U_Bandgap = 0;        // do not use internal Ref
+            adcmv[0] = ReadADC(TP3);        // get cap voltage with VCC reference
+            ADCconfig.U_Bandgap = ADC_internal_reference;
+            adcmv[1] = ReadADC(TP3);        // get cap voltage with internal reference
+            ADCconfig.U_Bandgap = 0;        // do not use internal Ref
+            adcmv[2] = ReadADC(TP3);        // get cap voltage with VCC reference
+            ADCconfig.U_Bandgap = ADC_internal_reference;
 
-          udiff = (int8_t)(((signed long)(adcmv[0] + adcmv[2] - adcmv[1] - adcmv[1])) * ADC_internal_reference / (2*adcmv[1]))+REF_R_KORR;
+            udiff = (int8_t) (((signed long) (adcmv[0] + adcmv[2] - adcmv[1] - adcmv[1])) * ADC_internal_reference /
+                              (2 * adcmv[1])) + REF_R_KORR;
 
-          lcd_line2();
-          lcd_fix2_string(REF_R_str);		// "REF_R="
+            lcd_line2();
+            lcd_fix2_string(REF_R_str);        // "REF_R="
 
-          udiff2 = udiff + (int8_t)eeprom_read_byte((uint8_t *)(&RefDiff));
-          (void) eeprom_write_byte((uint8_t *)(&RefDiff), (uint8_t)udiff2);	// hold offset for true reference Voltage
+            udiff2 = udiff + (int8_t) eeprom_read_byte((uint8_t *) (&RefDiff));
+            (void) eeprom_write_byte((uint8_t *) (&RefDiff),
+                                     (uint8_t) udiff2);    // hold offset for true reference Voltage
 
-          lcd_string(itoa(udiff2, outval, 10));	// output correction voltage
+            lcdString(itoa(udiff2, outval, 10));    // output correction voltage
 #endif
 
-        wait_about4s();
-        break;
-      }
+            wait_about4s();
+            break;
+        }
 
-      lcd_line2();
-      DisplayValue(cap.cval,cap.cpre,'F',4);
-      wait_about200ms();			// wait additional time
+        lcd_line2();
+        DisplayValue(cap.cval, cap.cpre, 'F', 4);
+        wait_about200ms();            // wait additional time
 
     }  // end for ww
 #endif
 
     ADCconfig.Samples = ANZ_MESS;        // set to configured number of ADC samples
 
-    lcd_clear();
+    lcdClear();
     lcd_line2();
     lcd_fix2_string(VERSION_str);        // "Version ..."
     lcd_line1();
-    lcd_fix_string(ATE);            // "Selftest End"
+    lcdFixString(ATE);            // "Selftest End"
 
 #ifdef FREQUENCY_50HZ
     //#define TEST_SLEEP_MODE		// only select for checking the sleep delay
-    lcd_fix_string(T50HZ);		// " 50Hz"
+    lcdFixString(T50HZ);		// " 50Hz"
     ADC_PORT = TXD_VAL;
     ADC_DDR = 1<<TP1 | TXD_MSK;		// Pin 1 to GND
     R_DDR = (1<<(TP3*2)) | (1<<(TP2*2));
@@ -3194,9 +3129,9 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
     if (adc.lp_otr > 455) {   // there is more than 650uA current without TristatePin current
 #if DebugOut == 5
                                                                                                                                 lcd_testpin(LowPin);
-      lcd_data('F');
+      lcdData('F');
       lcd_testpin(HighPin);
-      lcd_space();
+      lcdSpace();
       wait_about1s();
 #endif
 
@@ -3227,7 +3162,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
 
 #if DebugOut == 5
                                                                                                                                         lcd_data('N');
-          lcd_data('J');
+          lcdData('J');
 #endif
 
                 //if ((PartReady == 0) || (adc.lp1 > trans.uBE[0]))
@@ -3271,7 +3206,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
 
 #if DebugOut == 5
                                                                                                                                         lcd_data('P');
-          lcd_data('J');
+          lcdData('J');
 #endif
 
                 gthvoltage = adc.tp1 - adc.hp1;        // voltage GS (Gate - Source)
@@ -3323,9 +3258,9 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
 
 #if DebugOut == 5
                                                                                                                                 lcd_testpin(LowPin);
-      lcd_data('P');
+      lcdData('P');
       lcd_testpin(HighPin);
-      lcd_space();
+      lcdSpace();
       wait_about1s();
 #endif
 
@@ -3354,7 +3289,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
 
             if (adc.tp2 < 53) {
 #if DebugOut == 5
-                                                                                                                                        lcd_data('<');
+                                                                                                                                        lcdData('<');
             lcd_data('5');
             lcd_data('3');
 #endif
@@ -3466,9 +3401,9 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
         lcd_clear_line();
         lcd_line4();
         lcd_data('L');
-        lcd_data('P');
+        lcdData('P');
         lcd_string(utoa(adc.lp1,outval,10));
-        lcd_space();
+        lcdSpace();
         lcd_data('T');
         lcd_data('P');
         lcd_string(utoa(adc.tp1,outval,10));
@@ -3488,9 +3423,9 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
 
 #if DebugOut == 5
                                                                                                                                     lcd_testpin(LowPin);
-        lcd_data('N');
+        lcdData('N');
         lcd_testpin(HighPin);
-        lcd_space();
+        lcdSpace();
         wait_about1s();
 #endif
 
@@ -3568,10 +3503,10 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
                                                                                                                                     lcd_line3();
         lcd_clear_line();
         lcd_line3();
-        lcd_data('H');
+        lcdData('H');
         lcd_data('P');
         lcd_string(utoa(adc.hp2,outval,10));
-        lcd_space();
+        lcdSpace();
         lcd_data('T');
         lcd_data('P');
         lcd_string(utoa(adc.tp2,outval,10));
@@ -3589,7 +3524,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
             if (adc.tp2 < 53) {
 
 #if DebugOut == 5
-                                                                                                                                        lcd_data('<');
+                                                                                                                                        lcdData('<');
             lcd_data('5');
             lcd_data('3');
 #endif
@@ -3640,7 +3575,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
             lcd_clear_line();
             lcd_line3();
             lcd_data('N');
-            lcd_data('F');
+            lcdData('F');
             wait_about1s();
 #endif
 
@@ -3768,16 +3703,16 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
     lcd_testpin(HighPin);
     lcd_data('D');
     lcd_testpin(LowPin);
-    lcd_space();
+    lcdSpace();
     lcd_data('h');
     lcd_string(utoa(adc.hp3,outval,10));
-    lcd_space();
+    lcdSpace();
     lcd_data('L');
     lcd_string(utoa(adc.hp1,outval,10));
-    lcd_space();
-    lcd_data('H');
+    lcdSpace();
+    lcdData('H');
     lcd_string(utoa(adc.hp2,outval,10));
-    lcd_space();
+    lcdSpace();
     wait_about1s();
 #endif
 
@@ -3789,7 +3724,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
             PartFound = PART_DIODE;    // mark for diode only, if no other component is found
             // since there is a problem with Transistors with a protection diode
 #if DebugOut == 4
-            lcd_data('D');
+            lcdData('D');
 #endif
         }
 
@@ -3800,7 +3735,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
     }  // end voltage is above 0,15V and below 4,64V
 
 #if DebugOut == 4
-    lcd_data(NumOfDiodes+'0');
+    lcdData(NumOfDiodes+'0');
 #endif
 
     widmes:
@@ -3863,11 +3798,11 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
       lcd_testpin(LowPin);
       lcd_data('U');
       lcd_testpin(HighPin);
-      lcd_data('A');
+      lcdData('A');
       lcd_string(utoa(adc.hp1, outval, 10));
       lcd_data('B');
       lcd_string(utoa(adc.hp2, outval, 10));
-      lcd_space();
+      lcdSpace();
 #endif
 
         goto testend;
@@ -3912,7 +3847,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
         //voltage break down isn't insufficient
 
 #if DebugOut == 3
-        lcd_data('F');
+        lcdData('F');
 #endif
 
         goto testend;
@@ -4008,29 +3943,29 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
       lcd_testpin(LowPin);
       lcd_data(ii);
       lcd_testpin(HighPin);
-      lcd_space();
+      lcdSpace();
 
       if (ii == 'H') {
         lcd_data('X');
         DisplayValue(lirx1,1,LCD_CHAR_OMEGA,4)
-        lcd_space();
+        lcdSpace();
         lcd_data('Y');
         DisplayValue(lirx2,1,LCD_CHAR_OMEGA,4)
-        lcd_space();
+        lcdSpace();
       } else {
-        lcd_data('x');
+        lcdData('x');
         DisplayValue(lirx1,-1,LCD_CHAR_OMEGA,4)
-        lcd_space();
+        lcdSpace();
         lcd_data('y');
         DisplayValue(lirx2,-1,LCD_CHAR_OMEGA,4)
       }
 
-      lcd_space();
+      lcdSpace();
       lcd_line4();
       lcd_clear_line();
       lcd_line4();
       DisplayValue(lirx2,-1,LCD_CHAR_OMEGA,4)
-      lcd_space();
+      lcdSpace();
       lcd_line2();
 #endif
 
@@ -4048,11 +3983,11 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
 #if DebugOut == 3
                                                                                                                                             lcd_data('R');
             lcd_data('!');
-            lcd_data('=');
+            lcdData('=');
             DisplayValue(thisR->rx,-1,LCD_CHAR_OMEGA,3)
-            lcd_space();
+            lcdSpace();
             DisplayValue(lirx1,-1,LCD_CHAR_OMEGA,3)
-            lcd_space();
+            lcdSpace();
 #endif
 
                     goto testend;  // <10% mismatch
@@ -4076,7 +4011,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
             ResistorsFound++;        // 1 more resistor found
 
 #if DebugOut == 3
-                                                                                                                                    lcd_data(ResistorsFound+'0');
+                                                                                                                                    lcdData(ResistorsFound+'0');
         lcd_data('R');
 #endif
         }
@@ -4132,7 +4067,7 @@ void GetIr(uint8_t hipin, uint8_t lopin) {
     lcd_line4();
 #endif
 
-    lcd_fix_string(Ir_str);        // output text "  Ir="
+    lcdFixString(Ir_str);        // output text "  Ir="
 
 #ifdef WITH_IRMICRO
     if (u_res < 2500) {
@@ -4316,7 +4251,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 #endif
 
 #ifdef AUTO_CAL
-    pin_combination = (HighPin * 3) + LowPin - 1;	// coded Pin combination for capacity zero offset
+    pin_combination = (HighPin * 3) + LowPin - 1;    // coded Pin combination for capacity zero offset
 #endif
 
     LoADC = pgm_read_byte(&PinADCtab[LowPin]) | TXD_MSK;
@@ -4324,19 +4259,19 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     HiPinR_H = HiPinR_L + HiPinR_L;            // double for HighPin R_H load
 
 #if DebugOut == 10
-                                                                                                                            lcd_line3();
+    lcd_line3();
     lcd_clear_line();
     lcd_line3();
     lcd_testpin(LowPin);
-    lcd_data('C');
+    lcdData('C');
     lcd_testpin(HighPin);
-    lcd_space();
+    lcdSpace();
 #endif
 
     if (PartFound == PART_RESISTOR) {
 
 #if DebugOut == 10
-                                                                                                                                lcd_data('R');
+        lcdData('R');
       wait_about2s();
 #endif
 
@@ -4347,7 +4282,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
         if ((diodes[ii].Cathode == LowPin) && (diodes[ii].Anode == HighPin) && (diodes[ii].Voltage < 1500)) {
 
 #if DebugOut == 10
-                                                                                                                                    lcd_data('D');
+            lcdData('D');
         wait_about2s();
 #endif
 
@@ -4415,8 +4350,8 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     if (adcv[2] < 301) {
 
 #if DebugOut == 10
-                                                                                                                                lcd_data('K');
-      lcd_space();
+                                                                                                                                lcdData('K');
+      lcdSpace();
       wait1s();
 #endif
 
@@ -4446,15 +4381,15 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
       lcd_data('3');
       lcd_data(':');
       lcd_string(utoa(adcv[3],outval,10));
-      lcd_space();
+      lcdSpace();
       wait_about2s();
     #endif
 
     if ((adcv[3] + adcv[3]) < adcv[2]) {
 
       #if DebugOut == 10
-        lcd_data('H');
-        lcd_space();
+        lcdData('H');
+        lcdSpace();
         wait_about1s();
       #endif
 
@@ -4504,8 +4439,8 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
         // more than 100mV is lost during load time
 
 #if DebugOut == 10
-                                                                                                                                lcd_data('L');
-        lcd_space();
+                                                                                                                                lcdData('L');
+        lcdSpace();
         wait_about1s();
 #endif
 
@@ -4534,11 +4469,11 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     lcd_clear_line();
     lcd_line3();
     lcd_testpin(LowPin);
-    lcd_data('C');
+    lcdData('C');
     lcd_testpin(HighPin);
-    lcd_space();
+    lcdSpace();
     DisplayValue(cap.cval,cap.cpre,'F',4);
-    lcd_space();
+    lcdSpace();
     lcd_string(utoa(ovcnt16,outval,10));
     wait_about3s();
 #endif
@@ -4653,7 +4588,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     if (ovcnt16 >= (F_CPU / 10000)) {
 
 #if DebugOut == 10
-                                                                                                                                lcd_data('k');
+                                                                                                                                lcdData('k');
       wait_about1s();
 #endif
 
@@ -4684,14 +4619,14 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 #endif
 
 #ifdef AUTO_CAL
-                                                                                                                                // auto calibration mode, cap_null can be updated in selftest section
-      tmpint = eeprom_read_byte(&c_zero_tab[pin_combination]);	// read zero offset
+        // auto calibration mode, cap_null can be updated in selftest section
+        tmpint = eeprom_read_byte(&c_zero_tab[pin_combination]);    // read zero offset
 
-      if (cap.cval > tmpint) {
-        cap.cval -= tmpint;		// subtract zero offset (pF)
-      } else {
-        cap.cval = 0;			// unsigned long may not reach negativ value
-      }
+        if (cap.cval > tmpint) {
+            cap.cval -= tmpint;        // subtract zero offset (pF)
+        } else {
+            cap.cval = 0;            // unsigned long may not reach negativ value
+        }
 
 #else
         if (HighPin == TP2) cap.cval += TP2_CAP_OFFSET;    // measurements with TP2 have 2pF less capacity
@@ -4710,9 +4645,9 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     lcd_clear_line();
     lcd_line4();
     lcd_testpin(LowPin);
-    lcd_data('c');
+    lcdData('c');
     lcd_testpin(HighPin);
-    lcd_space();
+    lcdSpace();
     DisplayValue(cap.cval,cap.cpre,'F',4);
     wait_about3s();
 #endif
@@ -4728,8 +4663,8 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
         // cap.cval can only be so little in pF unit, cap.cpre must not be testet!
 
 #if DebugOut == 10
-                                                                                                                                lcd_data('<');
-        lcd_space();
+                                                                                                                                lcdData('<');
+        lcdSpace();
         wait_about1s();
 #endif
 
@@ -4743,8 +4678,8 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     if ((NumOfDiodes > 0) && (PartFound != PART_FET)) {
 
 #if DebugOut == 10
-                                                                                                                                lcd_data('D');
-      lcd_space();
+                                                                                                                                lcdData('D');
+      lcdSpace();
       wait_about1s();
 #endif
 
@@ -5029,7 +4964,7 @@ void ReadInductance(void) {
         // Voltage of comparator in % of umax
 
 #ifdef AUTO_CAL
-        tmpint = (ref_mv + (int16_t)eeprom_read_word((uint16_t *)(&ref_offset))) ;
+        tmpint = (ref_mv + (int16_t) eeprom_read_word((uint16_t *) (&ref_offset)));
 #else
         tmpint = (ref_mv + REF_C_KORR);
 #endif
@@ -5080,13 +5015,13 @@ void ReadInductance(void) {
         DisplayValue(timeconstant.dw,0,'+',4);
         DisplayValue(cnt_diff,0,' ',4);
         DisplayValue(total_r,-1,'r',4);
-        lcd_space();
+        lcdSpace();
         DisplayValue(per_ref1,-1,'%',4);
         lcd_line4();
         DisplayValue(tmpint,-3,'V',4);
-        lcd_space();
+        lcdSpace();
         DisplayValue(umax,-3,'V',4);
-        lcd_space();
+        lcdSpace();
         DisplayValue(per_ref2,-1,'%',4);
         wait_about4s();
         wait_about2s();
@@ -5331,7 +5266,7 @@ uint16_t GetESR(uint8_t hipin, uint8_t lopin) {
 
         // normal ADC-speed, ADC-Clock 8us
 #ifdef ADC_Sleep_Mode
-                                                                                                                                StartADCmsk = (1<<ADEN) | (1<<ADIF) | (1<<ADIE) | AUTO_CLOCK_DIV;  // enable ADC and Interrupt
+        StartADCmsk = (1<<ADEN) | (1<<ADIF) | (1<<ADIE) | AUTO_CLOCK_DIV;  // enable ADC and Interrupt
       ADCSRA = StartADCmsk;		// enable ADC and Interrupt
 #else
         StartADCmsk = (1 << ADSC) | (1 << ADEN) | (1 << ADIF) | AUTO_CLOCK_DIV;  // enable and start ADC
@@ -5486,7 +5421,7 @@ uint16_t GetESR(uint8_t hipin, uint8_t lopin) {
 #ifdef ESR_DEBUG
                                                                                                                             lcd_testpin(hipin);
     lcd_testpin(lopin);
-    lcd_data(' ');
+    lcdData(' ');
     DisplayValue(sumvolt[0],0,'L',4);	// LowPin 1
     lcd_line3();
     DisplayValue(sumvolt[1],0,'h',4);	// HighPin 1
@@ -5507,7 +5442,7 @@ uint16_t GetESR(uint8_t hipin, uint8_t lopin) {
 
 #ifdef ESR_DEBUG
                                                                                                                             DisplayValue(sumvolt[2],0,'d',4);	// HighPin - LowPin
-    lcd_data(' ');
+    lcdData(' ');
 #endif
 
     esrvalue = (sumvolt[2] * 10 * (unsigned long) RRpinMI) / (sumvolt[0] + sumvolt[2]);
@@ -5683,9 +5618,9 @@ void Calibrate_UR(void) {
     // get the port output resistance
 
 #ifdef AUTO_CAL
-                                                                                                                            uint16_t sum_rm;	// sum of 3 Pin voltages with 680 Ohm load
-    uint16_t sum_rp;	// sum of 3 Pin voltages with 680 Ohm load
-    uint16_t u680;	// 3 * (Voltage at 680 Ohm)
+    uint16_t sum_rm;    // sum of 3 Pin voltages with 680 Ohm load
+    uint16_t sum_rp;    // sum of 3 Pin voltages with 680 Ohm load
+    uint16_t u680;    // 3 * (Voltage at 680 Ohm)
 #endif
 
     //--------------------------------------------
@@ -5719,43 +5654,43 @@ void Calibrate_UR(void) {
     //--------------------------------------------
 
 #ifdef AUTO_CAL
-                                                                                                                            // measurement of internal resistance of the ADC port outputs switched to GND
-    ADC_DDR = 1<<TP1 | TXD_MSK;		// ADC-Pin  1 to output 0V
-    R_PORT = 1<<(TP1*2);		// R_L-PORT 1 to VCC
-    R_DDR = 1<<(TP1*2);			// Pin 1 to output and over R_L to VCC
+    // measurement of internal resistance of the ADC port outputs switched to GND
+    ADC_DDR = 1 << TP1 | TXD_MSK;        // ADC-Pin  1 to output 0V
+    R_PORT = 1 << (TP1 * 2);        // R_L-PORT 1 to VCC
+    R_DDR = 1 << (TP1 * 2);            // Pin 1 to output and over R_L to VCC
     sum_rm = W5msReadADC(TP1);
 
-    ADC_DDR = 1<<TP2 | TXD_MSK;		// ADC-Pin 2 to output 0V
-    R_PORT =  1<<(TP2*2);		// R_L-PORT 2 to VCC
-    R_DDR = 1<<(TP2*2);			// Pin 2 to output and over R_L to VCC
+    ADC_DDR = 1 << TP2 | TXD_MSK;        // ADC-Pin 2 to output 0V
+    R_PORT = 1 << (TP2 * 2);        // R_L-PORT 2 to VCC
+    R_DDR = 1 << (TP2 * 2);            // Pin 2 to output and over R_L to VCC
     sum_rm += W5msReadADC(TP2);
 
-    ADC_DDR = 1<<TP3 | TXD_MSK;		// ADC-Pin 3 to output 0V
-    R_PORT =  1<<(TP3*2);		// R_L-PORT 3 to VCC
-    R_DDR = 1<<(TP3*2);			// Pin 3 to output and over R_L to VCC
-    sum_rm += W5msReadADC(TP3);		// add all three values
+    ADC_DDR = 1 << TP3 | TXD_MSK;        // ADC-Pin 3 to output 0V
+    R_PORT = 1 << (TP3 * 2);        // R_L-PORT 3 to VCC
+    R_DDR = 1 << (TP3 * 2);            // Pin 3 to output and over R_L to VCC
+    sum_rm += W5msReadADC(TP3);        // add all three values
 
     // measurement of internal resistance of the ADC port output switched to VCC
-    R_PORT = 0;				// R-Ports to GND
-    ADC_PORT = 1<<TP1 | TXD_VAL;	// ADC-Port 1 to VCC
-    ADC_DDR = 1<<TP1 | TXD_MSK;		// ADC-Pin  1 to output 0V
-    R_DDR = 1<<(TP1*2);			// Pin 1 to output and over R_L to GND
+    R_PORT = 0;                // R-Ports to GND
+    ADC_PORT = 1 << TP1 | TXD_VAL;    // ADC-Port 1 to VCC
+    ADC_DDR = 1 << TP1 | TXD_MSK;        // ADC-Pin  1 to output 0V
+    R_DDR = 1 << (TP1 * 2);            // Pin 1 to output and over R_L to GND
     sum_rp = ADCconfig.U_AVCC - W5msReadADC(TP1);
 
-    ADC_PORT = 1<<TP2 | TXD_VAL;	// ADC-Port 2 to VCC
-    ADC_DDR = 1<<TP2 | TXD_MSK;		// ADC-Pin  2 to output 0V
-    R_DDR = 1<<(TP2*2);			// Pin 2 to output and over R_L to GND
+    ADC_PORT = 1 << TP2 | TXD_VAL;    // ADC-Port 2 to VCC
+    ADC_DDR = 1 << TP2 | TXD_MSK;        // ADC-Pin  2 to output 0V
+    R_DDR = 1 << (TP2 * 2);            // Pin 2 to output and over R_L to GND
     sum_rp += ADCconfig.U_AVCC - W5msReadADC(TP2);
 
-    ADC_PORT = 1<<TP3 | TXD_VAL;	// ADC-Port 3 to VCC
-    ADC_DDR = 1<<TP3 | TXD_MSK;		// ADC-Pin  3 to output 0V
-    R_DDR = 1<<(TP3*2);			// Pin 3 to output and over R_L to GND
+    ADC_PORT = 1 << TP3 | TXD_VAL;    // ADC-Port 3 to VCC
+    ADC_DDR = 1 << TP3 | TXD_MSK;        // ADC-Pin  3 to output 0V
+    R_DDR = 1 << (TP3 * 2);            // Pin 3 to output and over R_L to GND
     sum_rp += ADCconfig.U_AVCC - W5msReadADC(TP3);
 
-    u680 = ((ADCconfig.U_AVCC * 3) - sum_rm - sum_rp);	// three times the voltage at the 680 Ohm
-    pin_rmi = (unsigned long)((unsigned long)sum_rm * (unsigned long)R_L_VAL) / (unsigned long)u680;
+    u680 = ((ADCconfig.U_AVCC * 3) - sum_rm - sum_rp);    // three times the voltage at the 680 Ohm
+    pin_rmi = (unsigned long) ((unsigned long) sum_rm * (unsigned long) R_L_VAL) / (unsigned long) u680;
     //adcmv[2] = pin_rm;	// for last output in row 2
-    pin_rpl = (unsigned long)((unsigned long)sum_rp * (unsigned long)R_L_VAL) / (unsigned long)u680;
+    pin_rpl = (unsigned long) ((unsigned long) sum_rp * (unsigned long) R_L_VAL) / (unsigned long) u680;
     resis680pl = pin_rpl + R_L_VAL;
     resis680mi = pin_rmi + R_L_VAL;
 #endif
@@ -5771,32 +5706,41 @@ void Calibrate_UR(void) {
 #warning "strip-grid-board layout selected!"
 #endif
 
-void lcd_set_cursor(uint8_t row, uint8_t col) {
+void lcdCursor(uint8_t row, uint8_t col) {
     u8g2.setCursor(u8g2.getMaxCharWidth() * col + 2, u8g2.getMaxCharHeight() * row + (u8g2.getMaxCharHeight() / 3));
 
 
     uart_newline();
 }
 
-void lcd_string(char *data) {
+void lcdString(char *data) {
     while (*data) {
-        lcd_data(*data);
+        lcdData(*data);
         data++;
     }
+}
+
+/**
+ *
+ * @param str
+ */
+void lcdFlashString(const __FlashStringHelper *str) {
+    u8g2.print(str);
+    Serial.print(str);
 }
 
 /**
  * deprecated
  * @param data
  */
-void lcd_pgm_string(const unsigned char *data) {
+void lcdPgmString(const unsigned char *data) {
     u8g2.print((class __FlashStringHelper *) data);
     Serial.print((class __FlashStringHelper *) data);
 //    unsigned char cc;
 //    while (1) {
 //        cc = pgm_read_byte(data);
 //        if ((cc == 0) || (cc == 128)) return;
-//        lcd_data(cc);
+//        lcdData(cc);
 //        data++;
 //    }
 }
@@ -5804,33 +5748,22 @@ void lcd_pgm_string(const unsigned char *data) {
 
 // sends numeric character (Pin Number) to the LCD
 // from binary 0 we send ASCII 1
-void lcd_testpin(unsigned char temp) {
-    lcd_data(temp + '1');
+void lcdTestPin(unsigned char temp) {
+    lcdData(temp + '1');
 }
 
 // send space character to LCD
-void lcd_space(void) {
+void lcdSpace(void) {
     u8g2.print(F(" "));
 }
 
-void lcd_fix_string(const unsigned char *data) {
+void lcdFixString(const unsigned char *data) {
     u8g2.print((class __FlashStringHelper *) data);
     Serial.print((class __FlashStringHelper *) data);
 }
 
 // sends data byte to the LCD
-void lcd_data(unsigned char temp1) {
-#ifdef LCD1602
-    lcd.write(temp1);
-#endif
-
-#ifdef NOK5110
-    lcd.write(temp1);
-#endif
-
-#ifdef OLED096
-    display.write(temp1);
-#endif
+void lcdData(unsigned char temp1) {
 
 #ifdef lcdU8
     u8g2.write(temp1);
@@ -5838,42 +5771,38 @@ void lcd_data(unsigned char temp1) {
 
     switch (temp1) {
         case LCD_CHAR_DIODE1: {
-            uart_putc('>');
-            uart_putc('|');
+            serialPut(F(" ->|-"));
             break;
         }
         case LCD_CHAR_DIODE2: {
-            uart_putc('|');
-            uart_putc('<');
+            serialPut(F(" -|<- "));
             break;
         }
         case LCD_CHAR_CAP: {
-            uart_putc('|');
-            uart_putc('|');
+            serialPut(F(" -||- "));
             break;
         }
         case LCD_CHAR_RESIS1:
+            break;
         case LCD_CHAR_RESIS2: {
-            uart_putc('R');
+            serialPut(F("-=-"));
             break;
         }
         case LCD_CHAR_U: {        // micro
-            uart_putc('u');        // ASCII u
+            serialPut(F("u"));        // ASCII u
             break;
         }
         case LCD_CHAR_OMEGA: {    // Omega
-            uart_putc('o');           // "ohm"
-            uart_putc('h');
-            uart_putc('m');
+            serialPut(F("ohm"));           // "ohm"
             break;
         }
         default: {
-            uart_putc(temp1);
+            serialPut(temp1);
         }
     }
 }
 
-void lcd_clear(void) {
+void lcdClear(void) {
 #ifdef LCD1602
     lcd.clear();
 #endif
@@ -5893,8 +5822,14 @@ void lcd_clear(void) {
     uart_newline();
 }
 
-void uart_putc(uint8_t data) {
+void serialPut(const __FlashStringHelper *data) {
+    Serial.print(data);
+    delay(2);
+}
+
+void serialPut(uint8_t data) {
     Serial.write(data);
     delay(2);
 }
 
+#endif

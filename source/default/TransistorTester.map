@@ -275,16 +275,16 @@ LOAD /usr/lib/gcc/avr/4.5.3/avr5/libgcc.a
                 0x000000000000014a                __vector_18
                 0x000000000000014a                __vector_20
  .text          0x000000000000014e      0x1b2 lcd-routines.o
-                0x000000000000014e                lcd_data
+                0x000000000000014e                lcdData
                 0x00000000000001b8                lcd_space
-                0x00000000000001c0                lcd_testpin
+                0x00000000000001c0                lcdTestPin
                 0x00000000000001c8                uart_newline
                 0x00000000000001d6                lcd_command
-                0x00000000000001f6                lcd_clear
+                0x00000000000001f6                lcdClear
                 0x0000000000000210                lcd_init
-                0x0000000000000268                lcd_string
-                0x0000000000000290                lcd_pgm_string
-                0x00000000000002b0                lcd_fix_string
+                0x0000000000000268                lcdString
+                0x0000000000000290                lcdPgmString
+                0x00000000000002b0                lcdFixString
                 0x00000000000002d2                lcd_fix_customchar
  .text          0x0000000000000300       0x60 lcd_hw_4_bit.o
                 0x0000000000000300                _lcd_hw_write
@@ -308,7 +308,7 @@ LOAD /usr/lib/gcc/avr/4.5.3/avr5/libgcc.a
                 0x0000000000001dd2                GetIr
                 0x0000000000001e4a                main
  .text          0x0000000000002846       0x2a swuart.o
-                0x0000000000002846                uart_putc
+                0x0000000000002846                serialPut
  .text          0x0000000000002870       0x4a wait1000ms.o
                 0x0000000000002870                wait5s
                 0x0000000000002872                wait4s

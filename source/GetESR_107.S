@@ -315,7 +315,7 @@ ad_35fe:
 ad_3604:
        	ldi	r24, lo8(ESR_str);
        	ldi	r25, hi8(ESR_str);
- 	call	lcd_fix_string;		/* lcd_fix_string(ESR_str);	// " ESR=" */
+ 	call	lcd_fix_string;		/* lcdFixString(ESR_str);	// " ESR=" */
  	lds	r14, cap+ca;		/* LoADC = pgm_read_byte(&PinADCtab[cap.ca]) | TXD_MSK; */
         mov	SelectLowPin,r14
         ldi	r30, lo8(PinADCtab);
@@ -817,7 +817,7 @@ ad_39c0:
        	rjmp	ad_exit;		/* } else { */
 ad_3a0e:
       	ldi	r24,'!';		/* lcd_data('!');	// mark ESR zero without correction */
- 	call	lcd_data
+ 	call	lcdData
 //  return;				/* } } } */
 ad_exit:
 #ifdef ADC_Sleep_Mode

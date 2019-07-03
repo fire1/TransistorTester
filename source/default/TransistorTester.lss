@@ -199,13 +199,13 @@ void lcd_data(unsigned char temp1) {
     	break;
     case LCD_CHAR_RESIS1:
     case LCD_CHAR_RESIS2:
-    	uart_putc('R');
+    	serialPut('R');
      196:	82 e5       	ldi	r24, 0x52	; 82
      198:	0b c0       	rjmp	.+22     	; 0x1b0 <lcd_data+0x62>
 //    case LCD_CHAR_DEGREE:	// degree sign
 //    	uart_putc(0xf8);	// codepage 437 or 850 has degree
 //    	break;
-    case LCD_CHAR_U:		//µ
+    case LCD_CHAR_U:		//ï¿½
 //    	uart_putc(0xe6);	// codepage 437 or 850 has my
     	uart_putc('u');		// better use the ASCII u
      19a:	85 e7       	ldi	r24, 0x75	; 117
@@ -2950,7 +2950,7 @@ savenresult:
     1020:	8f 5f       	subi	r24, 0xFF	; 255
     1022:	80 93 05 01 	sts	0x0105, r24
 #if DebugOut == 4
-  lcd_data(NumOfDiodes+'0');
+  lcdData(NumOfDiodes+'0');
 #endif
 
 widmes:
@@ -3950,7 +3950,7 @@ void AutoCheck(void) {
     15ce:	e8 c3       	rjmp	.+2000   	; 0x1da0 <AutoCheck+0x814>
   lcd_clear();
     15d0:	0e 94 fb 00 	call	0x1f6	; 0x1f6 <lcd_clear>
-  lcd_fix_string(SELFTEST);		// "Selftest mode.."
+  lcdFixString(SELFTEST);		// "Selftest mode.."
     15d4:	8d eb       	ldi	r24, 0xBD	; 189
     15d6:	90 e0       	ldi	r25, 0x00	; 0
     15d8:	0e 94 58 01 	call	0x2b0	; 0x2b0 <lcd_fix_string>
@@ -4465,7 +4465,7 @@ void AutoCheck(void) {
     194c:	0e 94 34 01 	call	0x268	; 0x268 <lcd_string>
            lcd_space();
     1950:	0e 94 dc 00 	call	0x1b8	; 0x1b8 <lcd_space>
-           lcd_string(itoa(adcmv[2], outval, 10));	//output voltage 3
+           lcdString(itoa(adcmv[2], outval, 10));	//output voltage 3
     1954:	8d 81       	ldd	r24, Y+5	; 0x05
     1956:	9e 81       	ldd	r25, Y+6	; 0x06
     1958:	6c e0       	ldi	r22, 0x0C	; 12
@@ -4688,7 +4688,7 @@ void AutoCheck(void) {
     1a9a:	90 91 6b 01 	lds	r25, 0x016B
     1a9e:	9a 83       	std	Y+2, r25	; 0x02
     1aa0:	89 83       	std	Y+1, r24	; 0x01
-  lcd_clear();
+  lcdClear();
     1aa2:	0e 94 fb 00 	call	0x1f6	; 0x1f6 <lcd_clear>
   lcd_fix_string(C0_str);			//output "C0 "
     1aa6:	8d e8       	ldi	r24, 0x8D	; 141
@@ -5136,7 +5136,7 @@ no_c0save:
   lcd_fix2_string(VERSION_str);	//"Version ..."
     1d76:	88 ed       	ldi	r24, 0xD8	; 216
     1d78:	90 e0       	ldi	r25, 0x00	; 0
-    1d7a:	0e 94 48 01 	call	0x290	; 0x290 <lcd_pgm_string>
+    1d7a:	0e 94 48 01 	call	0x290	; 0x290 <lcdPgmString>
   lcd_line1();
     1d7e:	80 e8       	ldi	r24, 0x80	; 128
     1d80:	0e 94 eb 00 	call	0x1d6	; 0x1d6 <lcd_command>
@@ -5467,7 +5467,7 @@ start:
     1f24:	10 92 3d 01 	sts	0x013D, r1
   Calibrate_UR();		// get Ref Voltages and Pin resistance
     1f28:	0e 94 8f 1d 	call	0x3b1e	; 0x3b1e <Calibrate_UR>
-  lcd_line1();	//1. row 
+  lcd_line1();	//1. row
     1f2c:	80 e8       	ldi	r24, 0x80	; 128
     1f2e:	0e 94 eb 00 	call	0x1d6	; 0x1d6 <lcd_command>
   
@@ -5792,7 +5792,7 @@ start:
            lcd_testpin(diodes[0].Anode);
     213c:	80 91 78 01 	lds	r24, 0x0178
     2140:	0e 94 e0 00 	call	0x1c0	; 0x1c0 <lcd_testpin>
-        lcd_testpin(diodes[0].Anode);
+        lcdTestPin(diodes[0].Anode);
         lcd_fix_string(AnKat);		//"->|-"
         lcd_testpin(diodes[0].Cathode);
 #endif
@@ -7638,7 +7638,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 //==================================================================================
 // Measurement of little capacity values
 messe_mit_rh:
-  //little capacity value, about  < 50 µF
+  //little capacity value, about  < 50 ï¿½F
   EntladePins();			// discharge capacitor
     2c54:	0e 94 b2 01 	call	0x364	; 0x364 <EntladePins>
   //measure with the R_H (470kOhm) resistor 

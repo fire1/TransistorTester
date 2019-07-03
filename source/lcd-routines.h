@@ -13,20 +13,20 @@ extern void _lcd_hw_write(uint8_t flags, uint8_t data);
 
 
 //LCD
-void lcd_testpin(unsigned char temp);
-void lcd_data(unsigned char temp1);
+void lcdTestPin(unsigned char temp);
+void lcdData(unsigned char temp1);
 void lcd_space(void);
 void lcd_command(unsigned char temp1);
-void lcd_string(char *data);
+void lcdString(char *data);
 void lcd_init(void);
-void lcd_clear(void);
-void lcd_fix_string(const unsigned char *data);
-void lcd_pgm_string(const unsigned char *data);
+void lcdClear(void);
+void lcdFixString(const unsigned char *data);
+void lcdPgmString(const unsigned char *data);
 void lcd_fix_customchar(const unsigned char *chardata);
 void lcd_clear_line(void);		// only for DebugOut
 
 //Software-UART
-void uart_putc(uint8_t data);
+void serialPut(uint8_t data);
 void uart_newline(void);
 
 

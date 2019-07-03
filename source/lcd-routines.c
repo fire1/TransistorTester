@@ -21,17 +21,17 @@
 
 // sends numeric character (Pin Number) to the LCD 
 // from binary 0 we send ASCII 1 ....
-void lcd_testpin(unsigned char temp) {
-   lcd_data(temp + '1');
+void lcdTestPin(unsigned char temp) {
+    lcdData(temp + '1');
 }
 
 // send space character to LCD
 void lcd_space(void) {
-   lcd_data(' ');
+    lcdData(' ');
 }
 
 // sends data byte to the LCD 
-void lcd_data(unsigned char temp1) {
+void lcdData(unsigned char temp1) {
  lcd_write_data(temp1);		// set RS to 1
 #ifdef WITH_UART
  switch(temp1) {
@@ -54,8 +54,8 @@ void lcd_data(unsigned char temp1) {
 //    case LCD_CHAR_DEGREE:	// degree sign
 //    	uart_putc(0xf8);	// codepage 437 or 850 has degree
 //    	break;
-    case LCD_CHAR_U:		//µ
-//    	uart_putc(0xe6);	// codepage 437 or 850 has my
+    case LCD_CHAR_U:		//ï¿½
+//    	serialPut(0xe6);	// codepage 437 or 850 has my
     	uart_putc('u');		// better use the ASCII u
     	break;
     case LCD_CHAR_OMEGA:	//Omega
@@ -110,12 +110,12 @@ void lcd_init(void) {
    lcd_command(CMD_SetDisplayAndCursor | 0x04); // Display on / Cursor off / no Blinking
 
    lcd_command(CMD_SetEntryMode | 0x02);	// increment / no Scroll    
-   lcd_clear();
+    lcdClear();
 }
  
 // send the command to clear the display 
  
-void lcd_clear(void) {
+void lcdClear(void) {
    lcd_command(CLEAR_DISPLAY);
    wait_about10ms();
 #ifdef WITH_UART
@@ -128,44 +128,44 @@ void lcd_clear(void) {
 #ifdef WITH_UART
 void uart_newline(void) {
    uart_putc('\r');
-   uart_putc('\n');
+   serialPut('\n');
 }
 #endif
  
  
 // writes a string to the LCD 
  
-void lcd_string(char *data) {
+void lcdString(char *data) {
     while(*data) {
-        lcd_data(*data);
+        lcdData(*data);
         data++;
     }
 }
 
 #ifdef use_lcd_pgm
 //Load string from PGM  and send to LCD 
-void lcd_pgm_string(const unsigned char *data) {
+void lcdPgmString(const unsigned char *data) {
    unsigned char cc;
    while(1) {
       cc = pgm_read_byte(data);
       if((cc==0) || (cc==128)) {
          return;
       }
-      lcd_data(cc);
+       lcdData(cc);
       data++;
    }
 }
 #endif
 
 //Load string from PGM or EEprom and send to LCD 
-void lcd_fix_string(const unsigned char *data) {
+void lcdFixString(const unsigned char *data) {
    unsigned char cc;
    while(1) {
       cc = MEM_read_byte(data);
       if((cc==0) || (cc==128)) {
          return;
       }
-      lcd_data(cc);
+       lcdData(cc);
       data++;
    }
 }
@@ -173,7 +173,7 @@ void lcd_fix_string(const unsigned char *data) {
 // load custom character from PGM or EEprom and send to LCD
 void lcd_fix_customchar(const unsigned char *chardata) {	
     for(uint8_t i=0;i<8;i++) {
-        lcd_data(MEM_read_byte(chardata));
+        lcdData(MEM_read_byte(chardata));
         chardata++;
     }
 }

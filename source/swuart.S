@@ -28,7 +28,7 @@
 
 .global uart_putc
 .func uart_putc
-uart_putc:	
+serialPut:
 #ifdef WITH_UART
 		push bitcnt
 		in temp,_SFR_IO_ADDR(SREG)
