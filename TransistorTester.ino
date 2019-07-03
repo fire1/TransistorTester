@@ -27,6 +27,7 @@
 #include <avr/power.h>
 #include "TransistorTester.h"
 
+
 #define OLED_I2C
 #define lcdU8
 
@@ -812,6 +813,8 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 /* -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- */
 
 #define MAIN_C
+
+#include "bitmap48x64.h"
 
 #if defined(MAIN_C)
 #define COMMON
@@ -1869,8 +1872,10 @@ void loop() {
 
         if (PartMode & 1) {
             lcdFlashString(F("P"));            // P-channel
+            drawBmp(tt_pnp_bits);
         } else {
             lcdFlashString(F("N"));            // N-channel
+            drawBmp(tt_npn_bits);
         }
         lcdFlashString(F("-"));
 
@@ -1880,6 +1885,7 @@ void loop() {
         }
         if (tmp == (PART_MODE_N_E_MOS / 2)) {
             lcdFlashString(F("E"));             // N-E
+
         }
 
         if (tmp == (PART_MODE_N_JFET / 2)) {
@@ -5819,7 +5825,12 @@ void lcdClear(void) {
     u8g2.clearDisplay();
 #endif
 
+    lcd_line1();
     uart_newline();
+}
+
+void drawBmp(const uint8_t * bitmap){
+    u8g2.drawXBMP(64, 0, 48, 64, bitmap);
 }
 
 void serialPut(const __FlashStringHelper *data) {

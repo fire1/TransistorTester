@@ -19,6 +19,8 @@ void serialPut(const __FlashStringHelper *data);
 
 void lcdFixString(const unsigned char *data);
 
+void drawBmp(const uint8_t *bitmap);
+
 void Calibrate_UR();
 
 void lcdClear(void);
