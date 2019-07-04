@@ -20,7 +20,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1562136683
-ModificationTime: 1562217910
+ModificationTime: 1562237300
 OS2TypoAscent: 0
 OS2TypoAOffset: 1
 OS2TypoDescent: 0
@@ -2399,18 +2399,18 @@ BDFChar: 142 142 6 5 5 -2 -2
 z
 BDFChar: 143 143 6 5 5 -2 -2
 z
-BDFChar: 144 144 7 1 5 0 4
-E/9<HfDkmO
-BDFChar: 145 145 10 1 8 1 5
-,W,NX,QIfE
-BDFChar: 146 146 10 1 8 1 5
-,V8sH,QIfE
-BDFChar: 147 147 9 1 7 1 5
--n+L3-ia5I
-BDFChar: 148 148 6 0 5 2 7
--ra.[e0k:s
-BDFChar: 149 149 5 0 4 2 7
-TMSH]=J,Wo
+BDFChar: 144 144 7 0 5 0 5
+G_Ca'8B_&6
+BDFChar: 145 145 10 -1 10 -1 7
++TO4s.0(Xoj7">p.0)(&+TMKB
+BDFChar: 146 146 10 -1 10 -1 7
+#XA[2#s\h_r,<!.#s\d3#XA@i
+BDFChar: 147 147 9 -1 9 -1 7
+$31D5$31D5qqqe]$31D5$31&+
+BDFChar: 148 148 6 -1 5 -1 7
+'IkR>l3[kJ'EA+5
+BDFChar: 149 149 6 0 6 -1 7
+TMSH]:/Fb`TE"rl
 BDFChar: 150 150 6 1 3 3 3
 huE`W
 BDFChar: 151 151 6 0 5 3 3
