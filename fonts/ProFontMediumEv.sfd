@@ -20,7 +20,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1562136683
-ModificationTime: 1562137354
+ModificationTime: 1562217910
 OS2TypoAscent: 0
 OS2TypoAOffset: 1
 OS2TypoDescent: 0
@@ -408,7 +408,7 @@ EndChar
 
 StartChar: $45
 Encoding: 45 45 45
-Width: 6000
+Width: 666
 VWidth: 0
 Flags: W
 LayerCount: 2
@@ -1240,7 +1240,7 @@ EndChar
 
 StartChar: $149
 Encoding: 149 149 149
-Width: 6000
+Width: 416
 VWidth: 0
 Flags: W
 LayerCount: 2
@@ -2201,8 +2201,8 @@ BDFChar: 43 43 6 0 4 1 5
 +<^G%+92BA
 BDFChar: 44 44 6 1 2 -2 1
 ^q`3c
-BDFChar: 45 45 6 1 3 3 3
-huE`W
+BDFChar: 45 45 8 1 6 3 3
+qu?]s
 BDFChar: 46 46 6 2 3 0 1
 ^q]pM
 BDFChar: 47 47 6 0 4 -2 7
@@ -2399,7 +2399,7 @@ BDFChar: 142 142 6 5 5 -2 -2
 z
 BDFChar: 143 143 6 5 5 -2 -2
 z
-BDFChar: 144 144 7 1 5 2 6
+BDFChar: 144 144 7 1 5 0 4
 E/9<HfDkmO
 BDFChar: 145 145 10 1 8 1 5
 ,W,NX,QIfE
@@ -2407,10 +2407,10 @@ BDFChar: 146 146 10 1 8 1 5
 ,V8sH,QIfE
 BDFChar: 147 147 9 1 7 1 5
 -n+L3-ia5I
-BDFChar: 148 148 6 1 4 5 7
-:f*eb
-BDFChar: 149 149 6 0 4 2 6
-E;95'Du]k<
+BDFChar: 148 148 6 0 5 2 7
+-ra.[e0k:s
+BDFChar: 149 149 5 0 4 2 7
+TMSH]=J,Wo
 BDFChar: 150 150 6 1 3 3 3
 huE`W
 BDFChar: 151 151 6 0 5 3 3

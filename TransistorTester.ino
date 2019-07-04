@@ -288,7 +288,7 @@
   #define RST_PIN 0             // Pin, is switched to low, if push button is pressed
 #else
 // normal layout version
-#define RST_PIN 17            // Pin, is switched to low, if push button is pressed
+#define RST_PIN A3            // Pin, is switched to low, if push button is pressed
 #endif
 
 
@@ -814,7 +814,7 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 
 #define MAIN_C
 
-#include "bitmap48x64.h"
+#include "graphics/bitmap48x64.h"
 
 #if defined(MAIN_C)
 #define COMMON
@@ -1215,14 +1215,15 @@ uint8_t tmp = 0;
 //unsigned int PRR;
 
 byte TestKey;
-byte TestKeyPin = 17;  // A3
+
 
 #ifdef LCD1602
-                                                                                                                        #ifdef LCD_I2C
-    LiquidCrystal_I2C lcd(0x3F, 16, 2);
-  #else
-    LiquidCrystal lcd(7, 6, 5, 4, 3, 2);  // RS,E,D4,D5,D6,D7
-  #endif
+
+#ifdef LCD_I2C
+LiquidCrystal_I2C lcd(0x3F, 16, 2);
+#else
+LiquidCrystal lcd(7, 6, 5, 4, 3, 2);  // RS,E,D4,D5,D6,D7
+#endif
 #endif
 
 #ifdef NOK5110
@@ -1261,30 +1262,7 @@ U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
 // begin of transistortester program
 void setup() {
     Serial.begin(115200);
-
-    pinMode(TestKeyPin, INPUT);
-
-
-#ifdef NOK5110
-                                                                                                                            lcd.begin();
-    lcd.cp437(true);
-    lcd.setContrast(40);
-    lcd.clearDisplay();
-#endif
-
-#ifdef OLED096
-#ifdef OLED_I2C
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-#else
-    display.begin(SSD1306_SWITCHCAPVCC);
-#endif
-
-    display.cp437(true);
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.setCursor(0, 0);
-#endif
+    pinMode(RST_PIN, INPUT_PULLUP);
 
 
 #ifdef lcdU8
@@ -1299,7 +1277,7 @@ void setup() {
     lcdCursor(2, 0);
     lcdFlashString(F("for Arduino"));
     lcdCursor(3, 0);
-    lcdFlashString(F("1.08.2"));
+    lcdPgmString(VERSION_str);
 //
 #endif
 
@@ -1421,8 +1399,6 @@ void setup() {
 }
 
 void loop() {
-    // Entry: if start key is pressed before shut down
-    analogWrite(3, 200);
     start:
 
 #ifdef NOK5110
@@ -1443,13 +1419,15 @@ void loop() {
 
     TestKey = 1;
     while (TestKey) {
-        TestKey = digitalRead(TestKeyPin);
+        TestKey = digitalRead(RST_PIN);
         delay(100);
     }
     while (!TestKey) {
-        TestKey = digitalRead(TestKeyPin);
+        TestKey = digitalRead(RST_PIN);
         delay(100);
     }
+
+    Serial.println(F("Btn press"));
 
     lcdClear();
     delay(100);
@@ -1465,9 +1443,9 @@ void loop() {
     cap.ca = 0;
     cap.cb = 0;
 
-#ifdef WITH_UART
-    uart_newline();		// start of new measurement
-#endif
+
+    Serial.println();
+
 
     ADCconfig.RefFlag = 0;
     Calibrate_UR();        // get Ref Voltages and Pin resistance
@@ -1816,8 +1794,10 @@ void loop() {
 
         if (PartMode == PART_MODE_NPN) {
             lcdFixString(NPN_str);        // "NPN "
+            drawBmp(trs_pnp_bits);
         } else {
             lcdFixString(PNP_str);        // "PNP "
+            drawBmp(trs_pnp_bits);
         }
 
         if (NumOfDiodes > 2) {    // Transistor with protection diode
@@ -1872,10 +1852,10 @@ void loop() {
 
         if (PartMode & 1) {
             lcdFlashString(F("P"));            // P-channel
-            drawBmp(tt_pnp_bits);
+            drawBmp(mos_pnp_bits);
         } else {
             lcdFlashString(F("N"));            // N-channel
-            drawBmp(tt_npn_bits);
+            drawBmp(mos_npn_bits);
         }
         lcdFlashString(F("-"));
 
@@ -2048,6 +2028,7 @@ void loop() {
         lcdTestPin(cap.ca);        // Pin number 1
         lcdFixString(CapZeich);        // capacitor sign
         lcdTestPin(cap.cb);        // Pin number 2
+        drawBmp(cap_elt_bits);
 
 #if FLASHEND > 0x1fff
         GetVloss();            // get Voltage loss of capacitor
@@ -2106,7 +2087,10 @@ void loop() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - -
     end:
     empty_count = 0;        // reset counter, if part is found
-    mess_count++;            // count measurements
+    mess_count++;
+    Serial.println();
+    Serial.print(F("Ending 1"));
+
 
     end2:
     //ADC_DDR = (1<<TPREF) | TXD_MSK;  // switch pin with reference to GND, release relay
@@ -2116,7 +2100,7 @@ void loop() {
     while (!(ON_PIN_REG & (1 << RST_PIN)));    // wait ,until button is released
     wait_about200ms();
     // wait 14 seconds or 5 seconds (if repeat function)
-
+    Serial.print(F("Ending 2"));
     for (gthvoltage = 0; gthvoltage < display_time; gthvoltage += 10) {
         if (!(ON_PIN_REG & (1 << RST_PIN))) {
             // If the key is pressed again...
@@ -2154,8 +2138,9 @@ void loop() {
     }
 
 #else
-    goto start;  // POWER_OFF not selected, repeat measurement
 #endif
+    Serial.println(F("End of the loop"));
+    goto start;  // POWER_OFF not selected, repeat measurement
 
     return;
 } // end main
@@ -2300,6 +2285,8 @@ void EntladePins() {
             wait1ms();
         }
     }  // end for lop_cnt
+
+
 }
 
 
@@ -5829,7 +5816,7 @@ void lcdClear(void) {
     uart_newline();
 }
 
-void drawBmp(const uint8_t * bitmap){
+void drawBmp(const uint8_t *bitmap) {
     u8g2.drawXBMP(64, 0, 48, 64, bitmap);
 }
 
