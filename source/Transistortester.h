@@ -26,7 +26,7 @@
 
   */
 
-// Big Capacities (>50µF) are measured with up to 500 load-pulses with the 680 Ohm resistor.
+// Big Capacities (>50ï¿½F) are measured with up to 500 load-pulses with the 680 Ohm resistor.
 // Each  of this load-puls has an length of 10ms. After every load-pulse the voltage of the
 // capacitor is measured. If the voltage is more than 300mV, the capacity is computed by
 // interpolating the corresponding values of the table RLtab and multiply that with the number
@@ -62,20 +62,20 @@ End of configuration
 */
 
 #if defined(LANG_GERMAN)		//deutsch
-   const unsigned char TestRunning[] MEM_TEXT = "Testen..."; //€€€€€€€";
+   const unsigned char TestRunning[] MEM_TEXT = "Testen..."; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
    const unsigned char BatWeak[] MEM_TEXT = "gering";
-   const unsigned char BatEmpty[] MEM_TEXT = "leer!"; //€€€";
-   const unsigned char TestFailed2[] MEM_TEXT = "defektes "; //€€€";
-   const unsigned char Bauteil[] MEM_TEXT = "Bauteil"; //€€€";
+   const unsigned char BatEmpty[] MEM_TEXT = "leer!"; //ï¿½ï¿½ï¿½";
+   const unsigned char TestFailed2[] MEM_TEXT = "defektes "; //ï¿½ï¿½ï¿½";
+   const unsigned char Bauteil[] MEM_TEXT = "Bauteil"; //ï¿½ï¿½ï¿½";
 //   const unsigned char Diode[] MEM_TEXT = "Diode: ";
    const unsigned char Triac[] MEM_TEXT = "Triac";
    const unsigned char Thyristor[] MEM_TEXT = "Thyristor";
-   const unsigned char Unknown[] MEM_TEXT = " unbek."; //€€";
+   const unsigned char Unknown[] MEM_TEXT = " unbek."; //ï¿½ï¿½";
    const unsigned char TestFailed1[] MEM_TEXT = "Kein,unbek. oder";
-   const unsigned char OrBroken[] MEM_TEXT = "oder defekt "; //€";
+   const unsigned char OrBroken[] MEM_TEXT = "oder defekt "; //ï¿½";
    const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
    #define Cathode_char 'K'
- #ifdef WITH_SELFTEST
+ #ifdef WITH_SELF_TEST
    const unsigned char SELFTEST[] MEM_TEXT = "Selbsttest ..";
    const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
    const unsigned char ATE[] MEM_TEXT = "Test Ende";
@@ -83,20 +83,20 @@ End of configuration
 #endif
 
 #if defined(LANG_ENGLISH)		//english
-   const unsigned char TestRunning[] MEM_TEXT = "Testing..."; //€€€€€€";
-   const unsigned char BatWeak[] MEM_TEXT = "weak"; //€€€";
-   const unsigned char BatEmpty[] MEM_TEXT = "empty!"; //€€";
-   const unsigned char TestFailed2[] MEM_TEXT = "damaged "; //€€€€";
-   const unsigned char Bauteil[] MEM_TEXT = "part"; //€€€€€€";
+   const unsigned char TestRunning[] MEM_TEXT = "Testing..."; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
+   const unsigned char BatWeak[] MEM_TEXT = "weak"; //ï¿½ï¿½ï¿½";
+   const unsigned char BatEmpty[] MEM_TEXT = "empty!"; //ï¿½ï¿½";
+   const unsigned char TestFailed2[] MEM_TEXT = "damaged "; //ï¿½ï¿½ï¿½ï¿½";
+   const unsigned char Bauteil[] MEM_TEXT = "part"; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
 //   const unsigned char Diode[] MEM_TEXT = "Diode: ";
    const unsigned char Triac[] MEM_TEXT = "Triac";
    const unsigned char Thyristor[] MEM_TEXT = "Thyristor";
-   const unsigned char Unknown[] MEM_TEXT = " unknown"; //€";
-   const unsigned char TestFailed1[] MEM_TEXT = "No, unknown, or"; //€";
-   const unsigned char OrBroken[] MEM_TEXT = "or damaged "; //€€";
+   const unsigned char Unknown[] MEM_TEXT = " unknown"; //ï¿½";
+   const unsigned char TestFailed1[] MEM_TEXT = "No, unknown, or"; //ï¿½";
+   const unsigned char OrBroken[] MEM_TEXT = "or damaged "; //ï¿½ï¿½";
    const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
    #define Cathode_char 'C'
- #ifdef WITH_SELFTEST
+ #ifdef WITH_SELF_TEST
    const unsigned char SELFTEST[] MEM_TEXT = "Selftest mode..";
    const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
    const unsigned char ATE[] MEM_TEXT = "Test End";
@@ -104,20 +104,20 @@ End of configuration
 #endif
 
 #if defined(LANG_POLISH)		//polnisch
-   const unsigned char TestRunning[] MEM_TEXT = "Testowanie..."; //€€€";
-   const unsigned char BatWeak[] MEM_TEXT = "slaba"; //€€";
+   const unsigned char TestRunning[] MEM_TEXT = "Testowanie..."; //ï¿½ï¿½ï¿½";
+   const unsigned char BatWeak[] MEM_TEXT = "slaba"; //ï¿½ï¿½";
    const unsigned char BatEmpty[] MEM_TEXT = "za slaba";
    const unsigned char TestFailed2[] MEM_TEXT = "lub uszkodz.";
-   const unsigned char Bauteil[] MEM_TEXT = "Elemen"; //t€€€";
+   const unsigned char Bauteil[] MEM_TEXT = "Elemen"; //tï¿½ï¿½ï¿½";
 //   const unsigned char Diode[] MEM_TEXT = "Dioda: ";
    const unsigned char Triac[] MEM_TEXT = "Triak";
-   const unsigned char Thyristor[] MEM_TEXT = "Tyrystor"; //€";
+   const unsigned char Thyristor[] MEM_TEXT = "Tyrystor"; //ï¿½";
    const unsigned char Unknown[] MEM_TEXT = " nieznany";
-   const unsigned char TestFailed1[] MEM_TEXT = "brak elementu"; //€€€";
+   const unsigned char TestFailed1[] MEM_TEXT = "brak elementu"; //ï¿½ï¿½ï¿½";
    const unsigned char OrBroken[] MEM_TEXT = "lub uszkodz. ";
    const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
    #define Cathode_char 'K'
- #ifdef WITH_SELFTEST
+ #ifdef WITH_SELF_TEST
    const unsigned char SELFTEST[] MEM_TEXT = "Selftest mode..";
    const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
    const unsigned char ATE[] MEM_TEXT = "Test End";
@@ -126,19 +126,19 @@ End of configuration
 
 #if defined(LANG_CZECH)		//Tschechisch
    const unsigned char TestRunning[] MEM_TEXT = "Probiha mereni..";
-   const unsigned char BatWeak[] MEM_TEXT = "slaba"; //€€";
+   const unsigned char BatWeak[] MEM_TEXT = "slaba"; //ï¿½ï¿½";
    const unsigned char BatEmpty[] MEM_TEXT = "prazdna!";
-   const unsigned char TestFailed2[] MEM_TEXT = "vadna "; //€€€€€€";
-   const unsigned char Bauteil[] MEM_TEXT = "soucastka"; //€";
+   const unsigned char TestFailed2[] MEM_TEXT = "vadna "; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
+   const unsigned char Bauteil[] MEM_TEXT = "soucastka"; //ï¿½";
 //   const unsigned char Diode[] MEM_TEXT = "Dioda: ";
    const unsigned char Triac[] MEM_TEXT = "Triak";
-   const unsigned char Thyristor[] MEM_TEXT = "Tyristor"; //€";
-   const unsigned char Unknown[] MEM_TEXT = " neznama"; //€";
-   const unsigned char TestFailed1[] MEM_TEXT = "Zadna, neznama"; //€€";
-   const unsigned char OrBroken[] MEM_TEXT = "nebo vadna "; //€€";
+   const unsigned char Thyristor[] MEM_TEXT = "Tyristor"; //ï¿½";
+   const unsigned char Unknown[] MEM_TEXT = " neznama"; //ï¿½";
+   const unsigned char TestFailed1[] MEM_TEXT = "Zadna, neznama"; //ï¿½ï¿½";
+   const unsigned char OrBroken[] MEM_TEXT = "nebo vadna "; //ï¿½ï¿½";
    const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
    #define Cathode_char 'K'
- #ifdef WITH_SELFTEST
+ #ifdef WITH_SELF_TEST
    const unsigned char SELFTEST[] MEM_TEXT = "Selftest mode..";
    const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
    const unsigned char ATE[] MEM_TEXT = "Test End";
@@ -146,20 +146,20 @@ End of configuration
 #endif
 
 #if defined(LANG_SLOVAK)		//slowakisch
-   const unsigned char TestRunning[] MEM_TEXT = "PREBIEHA TEST"; //€€€";
-   const unsigned char BatWeak[] MEM_TEXT = "slaba"; //€€";
+   const unsigned char TestRunning[] MEM_TEXT = "PREBIEHA TEST"; //ï¿½ï¿½ï¿½";
+   const unsigned char BatWeak[] MEM_TEXT = "slaba"; //ï¿½ï¿½";
    const unsigned char BatEmpty[] MEM_TEXT = "prazdna!";
-   const unsigned char TestFailed2[] MEM_TEXT = "vadna "; //€€€€€€";
+   const unsigned char TestFailed2[] MEM_TEXT = "vadna "; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
    const unsigned char Bauteil[] MEM_TEXT = "suciastka!";
 //   const unsigned char Diode[] MEM_TEXT = "Dioda: ";
    const unsigned char Triac[] MEM_TEXT = "Triak";
-   const unsigned char Thyristor[] MEM_TEXT = "Tyristor"; //€";
-   const unsigned char Unknown[] MEM_TEXT = " neznama"; //€";
-   const unsigned char TestFailed1[] MEM_TEXT = "Ziadna, neznama"; //€";
-   const unsigned char OrBroken[] MEM_TEXT = "alebo vadna "; //€";
+   const unsigned char Thyristor[] MEM_TEXT = "Tyristor"; //ï¿½";
+   const unsigned char Unknown[] MEM_TEXT = " neznama"; //ï¿½";
+   const unsigned char TestFailed1[] MEM_TEXT = "Ziadna, neznama"; //ï¿½";
+   const unsigned char OrBroken[] MEM_TEXT = "alebo vadna "; //ï¿½";
    const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
    #define Cathode_char 'K'
- #ifdef WITH_SELFTEST
+ #ifdef WITH_SELF_TEST
    const unsigned char SELFTEST[] MEM_TEXT = "Selftest mode..";
    const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
    const unsigned char ATE[] MEM_TEXT = "Test End";
@@ -180,7 +180,7 @@ End of configuration
    const unsigned char OrBroken[] MEM_TEXT = "ali zanic "; 
    const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
    #define Cathode_char 'C'
- #ifdef WITH_SELFTEST
+ #ifdef WITH_SELF_TEST
    const unsigned char SELFTEST[] MEM_TEXT = "Selftest mode..";
    const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
    const unsigned char ATE[] MEM_TEXT = "Test End";
@@ -200,7 +200,7 @@ End of configuration
    const unsigned char OrBroken[] MEM_TEXT = "of defect "; 
    const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
    #define Cathode_char 'C'
-#ifdef WITH_SELFTEST
+#ifdef WITH_SELF_TEST
    const unsigned char SELFTEST[] MEM_TEXT = "Zelftest mode..";
    const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe";
    const unsigned char ATE[] MEM_TEXT = "Test Einde";
@@ -208,20 +208,20 @@ End of configuration
 #endif
 
 #if defined(LANG_BRASIL)					// Brazilian Portuguese
-   const unsigned char TestRunning[] MEM_TEXT = "Testando...";	//€€€€€€";
-   const unsigned char BatWeak[] MEM_TEXT = "fraca"; 		//€€€"; + 2
-   const unsigned char BatEmpty[] MEM_TEXT = "acabou!"; 	//€€"; +2
-   const unsigned char TestFailed2[] MEM_TEXT = "ou danificada..."; 	//€€€€";
-   const unsigned char Bauteil[] MEM_TEXT = "peca"; 		//€€€€€€";
+   const unsigned char TestRunning[] MEM_TEXT = "Testando...";	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
+   const unsigned char BatWeak[] MEM_TEXT = "fraca"; 		//ï¿½ï¿½ï¿½"; + 2
+   const unsigned char BatEmpty[] MEM_TEXT = "acabou!"; 	//ï¿½ï¿½"; +2
+   const unsigned char TestFailed2[] MEM_TEXT = "ou danificada..."; 	//ï¿½ï¿½ï¿½ï¿½";
+   const unsigned char Bauteil[] MEM_TEXT = "peca"; 		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
 //   const unsigned char Diode[] MEM_TEXT = "Diodo: ";
    const unsigned char Triac[] MEM_TEXT = "Triac";
    const unsigned char Thyristor[] MEM_TEXT = "Tiristor ";
-   const unsigned char Unknown[] MEM_TEXT = " O que? "; 	//€";
-   const unsigned char TestFailed1[] MEM_TEXT = "Sem peca, ruim"; //€";
-   const unsigned char OrBroken[] MEM_TEXT = "danificada "; 	//€€";
+   const unsigned char Unknown[] MEM_TEXT = " O que? "; 	//ï¿½";
+   const unsigned char TestFailed1[] MEM_TEXT = "Sem peca, ruim"; //ï¿½";
+   const unsigned char OrBroken[] MEM_TEXT = "danificada "; 	//ï¿½ï¿½";
    const unsigned char TestTimedOut[] MEM_TEXT = "Tempo Esgotado!";
    #define Cathode_char 'K'
- #ifdef WITH_SELFTEST
+ #ifdef WITH_SELF_TEST
    const unsigned char SELFTEST[] MEM_TEXT = "Autoteste...";
    const unsigned char RELPROBE[] MEM_TEXT = "Isole Pontas!";
    const unsigned char ATE[] MEM_TEXT = "Fim do Teste";
@@ -229,44 +229,44 @@ End of configuration
 #endif
 
 #if defined(LANG_RUSSIAN)		//Russian
-   const unsigned char TestRunning[] MEM_TEXT = {'T','e','c',Cyr_t,Cyr_i,'p','o',Cyr_v,'a',Cyr_n,Cyr_i,'e','.','.','.',0}; //’¥áâ¨à®¢ ­¨¥...";
-   const unsigned char BatWeak[] MEM_TEXT = {'C',Cyr_l,'a',Cyr_b,'a',Cyr_ja,0}; //á« ¡ ï";
-   const unsigned char BatEmpty[] MEM_TEXT = {Cyr_Z,'A','M','E','H','A',0}; //‡€Œ…€";
-   const unsigned char TestFailed2[] MEM_TEXT = {Cyr_p,'o',Cyr_v,'p','e',Cyr_zsch,Cyr_d,'.',' ',0}; //¯®¢à¥¦¤. ";
-   const unsigned char Bauteil[] MEM_TEXT = {Cyr_d,'e',Cyr_t,'a',Cyr_l,Cyr_ww,0}; //¤¥â «ì";
-//   const unsigned char Diode[] MEM_TEXT = {Cyr_D,Cyr_i,'o',Cyr_d,':',0}; //¤¨®¤: ";
-   const unsigned char Triac[] MEM_TEXT = {'C',Cyr_i,Cyr_m,Cyr_i,'c',Cyr_t,'o','p',0}; //‘¨¬¨áâ®à
-   const unsigned char Thyristor[] MEM_TEXT = {'T',Cyr_i,'p',Cyr_i,'c',Cyr_t,'o','p',0}; //’¨à¨áâ®à
-   const unsigned char Unknown[] MEM_TEXT = {' ',Cyr_n,'e',Cyr_i,Cyr_z,Cyr_v,'e','c',Cyr_t,'.',0}; // ­¥¨§¢¥áâ.";
-   const unsigned char TestFailed1[] MEM_TEXT = {'O',Cyr_t,'c','y',Cyr_t,'c',Cyr_t,Cyr_v,'y','e',Cyr_t,' ',Cyr_i,Cyr_l,Cyr_i,0}; //âáãâáâ¢ã¥â ¨«¨";
-   const unsigned char OrBroken[] MEM_TEXT = {Cyr_p,'o',Cyr_v,'p','e',Cyr_zsch,Cyr_d,'e',Cyr_n,'a',' ',0}; //¯®¢à¥¦¤¥­  ";
-   const unsigned char TestTimedOut[] MEM_TEXT = {'T','a',Cyr_j,Cyr_m,'a','y',Cyr_t,0}; //’ ©¬ ãâ
+   const unsigned char TestRunning[] MEM_TEXT = {'T','e','c',Cyr_t,Cyr_i,'p','o',Cyr_v,'a',Cyr_n,Cyr_i,'e','.','.','.',0}; //ï¿½ï¿½ï¿½ï¿½à®¢ï¿½ï¿½ï¿½ï¿½...";
+   const unsigned char BatWeak[] MEM_TEXT = {'C',Cyr_l,'a',Cyr_b,'a',Cyr_ja,0}; //á« ï¿½ï¿½ï¿½";
+   const unsigned char BatEmpty[] MEM_TEXT = {Cyr_Z,'A','M','E','H','A',0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
+   const unsigned char TestFailed2[] MEM_TEXT = {Cyr_p,'o',Cyr_v,'p','e',Cyr_zsch,Cyr_d,'.',' ',0}; //ï¿½ï¿½ï¿½à¥¦ï¿½. ";
+   const unsigned char Bauteil[] MEM_TEXT = {Cyr_d,'e',Cyr_t,'a',Cyr_l,Cyr_ww,0}; //ï¿½ï¿½â «ï¿½";
+//   const unsigned char Diode[] MEM_TEXT = {Cyr_D,Cyr_i,'o',Cyr_d,':',0}; //ï¿½ï¿½ï¿½ï¿½: ";
+   const unsigned char Triac[] MEM_TEXT = {'C',Cyr_i,Cyr_m,Cyr_i,'c',Cyr_t,'o','p',0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+   const unsigned char Thyristor[] MEM_TEXT = {'T',Cyr_i,'p',Cyr_i,'c',Cyr_t,'o','p',0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+   const unsigned char Unknown[] MEM_TEXT = {' ',Cyr_n,'e',Cyr_i,Cyr_z,Cyr_v,'e','c',Cyr_t,'.',0}; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.";
+   const unsigned char TestFailed1[] MEM_TEXT = {'O',Cyr_t,'c','y',Cyr_t,'c',Cyr_t,Cyr_v,'y','e',Cyr_t,' ',Cyr_i,Cyr_l,Cyr_i,0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½";
+   const unsigned char OrBroken[] MEM_TEXT = {Cyr_p,'o',Cyr_v,'p','e',Cyr_zsch,Cyr_d,'e',Cyr_n,'a',' ',0}; //ï¿½ï¿½ï¿½à¥¦ï¿½ï¿½ï¿½ï¿½ ";
+   const unsigned char TestTimedOut[] MEM_TEXT = {'T','a',Cyr_j,Cyr_m,'a','y',Cyr_t,0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
    #define Cathode_char 'C'
- #ifdef WITH_SELFTEST
-   const unsigned char SELFTEST[] MEM_TEXT = {'P','e',Cyr_zsch,Cyr_i,Cyr_m,' ','c','a',Cyr_m,'o',Cyr_t,'e','c',Cyr_t,'a',0}; //¥¦¨¬ á ¬®â¥áâ 
-   const unsigned char RELPROBE[] MEM_TEXT = {Cyr_I,Cyr_z,'o',Cyr_l,Cyr_ja,Cyr_c,Cyr_i,Cyr_ja,'!',0}; //ˆ§®«ïæ¨ï! 
-   const unsigned char ATE[] MEM_TEXT = {'T','e','c',Cyr_t,' ',Cyr_z,'a',Cyr_k,'o',Cyr_n,Cyr_tsch,'e',Cyr_n,0}; //’¥áâ § ª®­ç¥­
+ #ifdef WITH_SELF_TEST
+   const unsigned char SELFTEST[] MEM_TEXT = {'P','e',Cyr_zsch,Cyr_i,Cyr_m,' ','c','a',Cyr_m,'o',Cyr_t,'e','c',Cyr_t,'a',0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ á ¬ï¿½ï¿½ï¿½ï¿½
+   const unsigned char RELPROBE[] MEM_TEXT = {Cyr_I,Cyr_z,'o',Cyr_l,Cyr_ja,Cyr_c,Cyr_i,Cyr_ja,'!',0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½! 
+   const unsigned char ATE[] MEM_TEXT = {'T','e','c',Cyr_t,' ',Cyr_z,'a',Cyr_k,'o',Cyr_n,Cyr_tsch,'e',Cyr_n,0}; //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ç¥­
  #endif
 #endif
 
 #if defined(LANG_UKRAINIAN)		//Ukrainian
-   const unsigned char TestRunning[] MEM_TEXT = {'T','e','c',Cyr_t,'y',Cyr_v,'a',Cyr_n,Cyr_n,Cyr_ja,'.','.','.',0}; //’¥áâã¢ ­­ï...";
-   const unsigned char BatWeak[] MEM_TEXT = {'C',Cyr_l,'a',Cyr_b,Cyr_k,'a',0}; //‘« ¡ª ";
-   const unsigned char BatEmpty[] MEM_TEXT = {Cyr_Z,'A','M','I','H','A',0}; //‡€ŒI€";
-   const unsigned char TestFailed2[] MEM_TEXT = {Cyr_v,'i',Cyr_d,'c','y',Cyr_t,Cyr_n,Cyr_ja,' ',0}; //¢i¤áãâ­ï ";
-   const unsigned char Bauteil[] MEM_TEXT = {Cyr_d,'e',Cyr_t,'a',Cyr_l,Cyr_ww,0}; //¤¥â «ì";
-//   const unsigned char Diode[] MEM_TEXT = {Cyr_D,'i','o',Cyr_d,':',0}; //¤¨®¤: ";
-   const unsigned char Triac[] MEM_TEXT = {'C',Cyr_i,Cyr_m,'i','c',Cyr_t,'o','p',0}; //‘¨¬iáâ®à
-   const unsigned char Thyristor[] MEM_TEXT = {'T',Cyr_i,'p',Cyr_i,'c',Cyr_t,'o','p',0}; //’¨à¨áâ®à
-   const unsigned char Unknown[] MEM_TEXT = {' ',Cyr_n,'e',Cyr_v,'i',Cyr_d,'o',Cyr_m,'a',0}; //" ­¥¢i¤®¬ ";
-   const unsigned char TestFailed1[] MEM_TEXT = {Cyr_P,'o',Cyr_sch,Cyr_k,'o',Cyr_d,Cyr_zsch,'e',Cyr_n,'a',' ',' ','a',Cyr_b,'o',0}; //®èª®¤¦¥­   ¡®";
-   const unsigned char OrBroken[] MEM_TEXT = {Cyr_n,'e','c',Cyr_p,'p','a',Cyr_v,Cyr_n,'a',' ',' ',0}; //­¥á¯à ¢­   ";
-   const unsigned char TestTimedOut[] MEM_TEXT = {'T','a',Cyr_j,Cyr_m,'a','y',Cyr_t,0}; //’ ©¬ ãâ
+   const unsigned char TestRunning[] MEM_TEXT = {'T','e','c',Cyr_t,'y',Cyr_v,'a',Cyr_n,Cyr_n,Cyr_ja,'.','.','.',0}; //ï¿½ï¿½ï¿½ï¿½ã¢ ï¿½ï¿½ï¿½...";
+   const unsigned char BatWeak[] MEM_TEXT = {'C',Cyr_l,'a',Cyr_b,Cyr_k,'a',0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
+   const unsigned char BatEmpty[] MEM_TEXT = {Cyr_Z,'A','M','I','H','A',0}; //ï¿½ï¿½ï¿½Iï¿½ï¿½";
+   const unsigned char TestFailed2[] MEM_TEXT = {Cyr_v,'i',Cyr_d,'c','y',Cyr_t,Cyr_n,Cyr_ja,' ',0}; //ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ ";
+   const unsigned char Bauteil[] MEM_TEXT = {Cyr_d,'e',Cyr_t,'a',Cyr_l,Cyr_ww,0}; //ï¿½ï¿½â «ï¿½";
+//   const unsigned char Diode[] MEM_TEXT = {Cyr_D,'i','o',Cyr_d,':',0}; //ï¿½ï¿½ï¿½ï¿½: ";
+   const unsigned char Triac[] MEM_TEXT = {'C',Cyr_i,Cyr_m,'i','c',Cyr_t,'o','p',0}; //ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½
+   const unsigned char Thyristor[] MEM_TEXT = {'T',Cyr_i,'p',Cyr_i,'c',Cyr_t,'o','p',0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+   const unsigned char Unknown[] MEM_TEXT = {' ',Cyr_n,'e',Cyr_v,'i',Cyr_d,'o',Cyr_m,'a',0}; //" ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½";
+   const unsigned char TestFailed1[] MEM_TEXT = {Cyr_P,'o',Cyr_sch,Cyr_k,'o',Cyr_d,Cyr_zsch,'e',Cyr_n,'a',' ',' ','a',Cyr_b,'o',0}; //ï¿½ï¿½èª®ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½";
+   const unsigned char OrBroken[] MEM_TEXT = {Cyr_n,'e','c',Cyr_p,'p','a',Cyr_v,Cyr_n,'a',' ',' ',0}; //ï¿½ï¿½ï¿½à ¢ï¿½ï¿½  ";
+   const unsigned char TestTimedOut[] MEM_TEXT = {'T','a',Cyr_j,Cyr_m,'a','y',Cyr_t,0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
    #define Cathode_char 'C'
- #ifdef WITH_SELFTEST
-   const unsigned char SELFTEST[] MEM_TEXT = {'P','e',Cyr_zsch,Cyr_i,Cyr_m,' ','c','a',Cyr_m,'o',Cyr_t,'e','c',Cyr_t,'y',0}; //¥¦¨¬ á ¬®â¥áâã
-   const unsigned char RELPROBE[] MEM_TEXT = {'I',Cyr_z,'o',Cyr_l,Cyr_ja,Cyr_c,'i',Cyr_ja,'!',0}; //I§®«ïæiï! 
-   const unsigned char ATE[] MEM_TEXT = {'T','e','c',Cyr_t,' ',Cyr_z,'a',Cyr_k,'i',Cyr_n,Cyr_tsch,'e',Cyr_n,'o',0}; //’¥áâ § ªi­ç¥­®
+ #ifdef WITH_SELF_TEST
+   const unsigned char SELFTEST[] MEM_TEXT = {'P','e',Cyr_zsch,Cyr_i,Cyr_m,' ','c','a',Cyr_m,'o',Cyr_t,'e','c',Cyr_t,'y',0}; //ï¿½ï¿½ï¿½ï¿½ï¿½ á ¬ï¿½ï¿½ï¿½ï¿½ï¿½
+   const unsigned char RELPROBE[] MEM_TEXT = {'I',Cyr_z,'o',Cyr_l,Cyr_ja,Cyr_c,'i',Cyr_ja,'!',0}; //Iï¿½ï¿½ï¿½ï¿½ï¿½iï¿½! 
+   const unsigned char ATE[] MEM_TEXT = {'T','e','c',Cyr_t,' ',Cyr_z,'a',Cyr_k,'i',Cyr_n,Cyr_tsch,'e',Cyr_n,'o',0}; //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½iï¿½ç¥­ï¿½
  #endif
 #endif
 
@@ -319,7 +319,7 @@ End of configuration
  const unsigned char VERSION_str[] MEM2_TEXT = "Version 1.08k";
 
 
-#ifdef WITH_SELFTEST
+#ifdef WITH_SELF_TEST
  const unsigned char URefT[] MEM2_TEXT = "Ref=";
  const unsigned char RHfakt[] MEM2_TEXT = "RHf=";
  const unsigned char RH1L[] MEM_TEXT = "RH-";
@@ -396,12 +396,12 @@ End of configuration
 				     (1<<TP2),
 				     (1<<TP3)};	// Table of commands to switch the ADC-Pins 0,1,2
 
-//generate Omega- and µ-character as Custom-character, if these characters has a number of loadable type
+//generate Omega- and ï¿½-character as Custom-character, if these characters has a number of loadable type
 #if LCD_CHAR_OMEGA < 8
    const unsigned char CyrillicOmegaIcon[] MEM_TEXT = {0,0,14,17,17,10,27,0};	//Omega
 #endif
 #if LCD_CHAR_U < 8
-   const unsigned char CyrillicMuIcon[] MEM_TEXT = {0,17,17,17,19,29,16,16};	//µ
+   const unsigned char CyrillicMuIcon[] MEM_TEXT = {0,17,17,17,19,29,16,16};	//ï¿½
 #endif
 
 #ifdef AUTO_CAL
@@ -423,7 +423,7 @@ End of configuration
 #else
  // no MAIN_C
  #define COMMON extern
- #ifdef WITH_SELFTEST
+ #ifdef WITH_SELF_TEST
   extern const unsigned char SELFTEST[] MEM_TEXT;
   extern const unsigned char RELPROBE[] MEM_TEXT;
   extern const unsigned char ATE[] MEM_TEXT;
@@ -501,7 +501,7 @@ COMMON struct cap_t {
   unsigned int v_loss;		// voltage loss 0.1%
 #endif
   uint8_t ca, cb;		//pins of capacitor
-  int8_t cpre;			//Prefix for capacitor value  -12=p, -9=n, -6=µ, -3=m
+  int8_t cpre;			//Prefix for capacitor value  -12=p, -9=n, -6=ï¿½, -3=m
   int8_t cpre_max;		//Prefix of the biggest capacitor
 } cap;
 #ifndef INHIBIT_SLEEP_MODE

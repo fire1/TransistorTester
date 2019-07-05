@@ -7,6 +7,7 @@
 
 #include <Arduino.h>
 
+
 void lcdString(char *data);
 
 void lcdCursor(uint8_t row, uint8_t col);
@@ -39,7 +40,7 @@ unsigned int W10msReadADC(uint8_t Probe);
 
 unsigned int W20msReadADC(uint8_t Probe);
 
-void DisplayValue(unsigned long Value, int8_t Exponent, unsigned char Unit, unsigned char digits);
+void displayValue(unsigned long Value, int8_t Exponent, unsigned char Unit, unsigned char digits);
 
 void GetIr(uint8_t hipin, uint8_t lopin);
 
@@ -66,6 +67,9 @@ void RefVoltage(void);
 void PinLayout(char pin1, char pin2, char pin3);
 
 uint16_t GetESR(uint8_t hipin, uint8_t lopin);
+
 void unloadingPins();
+
+void waitForButton();
 
 #endif //TRANSISTORTESTER_TRANSISTORTESTER_H

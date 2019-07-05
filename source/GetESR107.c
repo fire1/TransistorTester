@@ -362,7 +362,7 @@ void GetESR() {
    }
 //   lcd_line3();
 //   DisplayValue(jj,0,' ',4);	// correction for ESR_ZERO
-//   DisplayValue(1000+esr0,0,' ',4);	// new ESR_ZERO
+//   displayValue(1000+esr0,0,' ',4);	// new ESR_ZERO
 
  #ifdef ADC_Sleep_Mode
      SMCR = (0 << SM0) | (0 << SE);	/* clear ADC Noise Reduction and Sleep Enable */

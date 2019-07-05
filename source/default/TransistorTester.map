@@ -294,7 +294,7 @@ LOAD /usr/lib/gcc/avr/4.5.3/avr5/libgcc.a
                 0x0000000000000364                EntladePins
                 0x000000000000049a                RefVoltage
                 0x000000000000051e                lcd_clear_line
-                0x000000000000052e                DisplayValue
+                0x000000000000052e                displayValue
                 0x00000000000006a4                RvalOut
                 0x0000000000000712                mVAusgabe
                 0x0000000000000742                UfAusgabe

@@ -737,7 +737,7 @@ ad_3972:
 	call	DisplayValue
         ldi	r24, ' '
         call	lcd_data
-      	ldd	r22, Y+sumvolt2;		/* DisplayValue(sumvolt2,0,' ',4); */
+      	ldd	r22, Y+sumvolt2;		/* displayValue(sumvolt2,0,' ',4); */
       	ldd	r23, Y+sumvolt2+1;
       	ldd	r24, Y+sumvolt2+2;
       	ldd	r25, Y+sumvolt2+3;

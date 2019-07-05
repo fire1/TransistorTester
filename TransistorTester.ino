@@ -31,7 +31,7 @@
 #define OLED_I2C
 #define lcdU8
 
-#define WITH_SELFTEST;
+#define WITH_SELF_TEST 1;
 
 #ifdef LCD1602
 
@@ -71,7 +71,7 @@
 #endif
 
 #endif
-
+#include "language.h"
 #define AUTO_CAL
 // ******** config options for your Semiconductor tester
 
@@ -99,8 +99,8 @@
 // The connection of LCD is totally different for both versions.
 //#define STRIP_GRID_BOARD
 
-// The WITH_SELFTEST option enables selftest function (only for mega168 or mega328).
-//#define WITH_SELFTEST
+// The WITH_SELF_TEST option enables selftest function (only for mega168 or mega328).
+//#define WITH_SELF_TEST
 
 // AUTO_CAL will enable the autocalibration of zero offset of capacity measurement and
 // also the port output resistance values will be find out in SELFTEST section.
@@ -720,7 +720,7 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #endif
 
 #undef CHECK_CALL
-#ifdef WITH_SELFTEST
+#ifdef WITH_SELF_TEST
 // AutoCheck Function is needed
 #define CHECK_CALL
 #endif
@@ -760,42 +760,7 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #endif
 
 
-#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
-#define LCD_CHAR_DIODE1 0x91 // Diode-Icon; will be generated as custom character
-#define LCD_CHAR_DIODE2 0x92 // Diode-Icon; will be generated as custom character
-#define LCD_CHAR_CAP    0x93 // Capacitor-Icon;  will be generated as custom character
-// numbers of RESIS1 and RESIS2 are swapped for OLED display, which shows a corrupt RESIS1 character otherwise ???
-#define LCD_CHAR_RESIS1 0x94 // Resistor left part will be generated as custom character
-#define LCD_CHAR_RESIS2 0x95 // Resistor right part will be generated as custom character
-#define LCD_CHAR_OMEGA  0x90 // Omega-character
-#define LCD_CHAR_U      0xB5 // micro-characte
 
-#else
-// self build characters
-#define LCD_CHAR_DIODE1  1      // Diode-Icon; will be generated as custom character
-#define LCD_CHAR_DIODE2  2      // Diode-Icon; will be generated as custom character
-#define LCD_CHAR_CAP 3          // Capacitor-Icon;  will be generated as custom character
-// numbers of RESIS1 and RESIS2 are swapped for OLED display, which shows a corrupt RESIS1 character otherwise ???
-#define LCD_CHAR_RESIS1 7       // Resistor left part will be generated as custom character
-#define LCD_CHAR_RESIS2 6       // Resistor right part will be generated as custom character
-
-#ifdef LCD_CYRILLIC
-#define LCD_CHAR_OMEGA  4       // Omega-character
-#define LCD_CHAR_U  5           // micro-character
-#else
-#define LCD_CHAR_OMEGA  244     // Omega-character
-#define LCD_CHAR_U  228         // micro-character
-#endif
-
-#ifdef LCD_DOGM
-#undef LCD_CHAR_OMEGA
-#define LCD_CHAR_OMEGA 0x1e     // Omega-character for DOGM module
-#undef LCD_CHAR_U
-#define LCD_CHAR_U  5           // micro-character for DOGM module loadable
-#endif
-
-#define LCD_CHAR_DEGREE 0xdf      // Character for degree
-#endif
 
 #endif  // #ifndef ADC_PORT
 
@@ -858,101 +823,6 @@ const uint16_t RHtab[] PROGMEM = {954, 903, 856, 814, 775, 740, 707, 676, 648};
 // Strings in PROGMEM or in EEprom
 
 
-#if defined(LANG_ENGLISH)        // english
-const unsigned char TestRunning[] MEM_TEXT = "Testing...";
-const unsigned char BatWeak[] MEM_TEXT = "weak";
-const unsigned char BatEmpty[] MEM_TEXT = "empty!";
-const unsigned char TestFailed2[] MEM_TEXT = "damaged ";
-const unsigned char Component[] MEM_TEXT = "part";
-//const unsigned char Diode[] MEM_TEXT = "Diode: ";
-const unsigned char Triac[] MEM_TEXT = "Triac";
-const unsigned char Thyristor[] MEM_TEXT = "Thyristor";
-const unsigned char Unknown[] MEM_TEXT = " unknown";
-const unsigned char TestFailed1[] MEM_TEXT = "No, unknown, or";
-const unsigned char OrBroken[] MEM_TEXT = "or damaged ";
-const unsigned char TestTimedOut[] MEM_TEXT = "Timeout!";
-#define Cathode_char 'C'
-
-#ifdef WITH_SELFTEST
-const unsigned char SELFTEST[] MEM_TEXT = "Selftest mode..";
-const unsigned char RELPROBE[] MEM_TEXT = "isolate Probe!";
-const unsigned char ATE[] MEM_TEXT = "Test End";
-#endif
-#endif
-
-
-// Strings, which are not dependent of any language
-const unsigned char Bat_str[] MEM_TEXT = "Bat. ";
-const unsigned char OK_str[] MEM_TEXT = "OK";
-const unsigned char mosfet_str[] MEM_TEXT = "-MOS";
-const unsigned char jfet_str[] MEM_TEXT = "JFET";
-const unsigned char GateCap_str[] MEM_TEXT = "C=";
-const unsigned char hfe_str[] MEM_TEXT = "B=";
-const unsigned char NPN_str[] MEM_TEXT = "NPN ";
-const unsigned char PNP_str[] MEM_TEXT = "PNP ";
-
-#ifndef EBC_STYLE
-const unsigned char N123_str[] MEM_TEXT = " 123=";
-//const unsigned char N123_str[] MEM_TEXT = " Pin=";
-#else
-                                                                                                                        #if EBC_STYLE == 321
-    const unsigned char N321_str[] MEM_TEXT = " 321=";
-  #endif
-#endif
-
-const unsigned char Uf_str[] MEM_TEXT = "Uf=";
-const unsigned char vt_str[] MEM_TEXT = " Vt=";
-const unsigned char Vgs_str[] MEM_TEXT = "@Vgs=";
-const unsigned char CapZeich[] MEM_TEXT = {'-', LCD_CHAR_CAP, '-', 0};
-const unsigned char Cell_str[] MEM_TEXT = "Cell!";
-const unsigned char VCC_str[] MEM_TEXT = "VCC=";
-
-#if FLASHEND > 0x1fff
-const unsigned char ESR_str[] MEM_TEXT = " ESR=";
-const unsigned char VLOSS_str[] MEM_TEXT = " Vloss=";
-const unsigned char Lis_str[] MEM_TEXT = "L=";
-const unsigned char Ir_str[] MEM_TEXT = "  Ir=";
-
-
-const unsigned char VERSION_str[] MEM2_TEXT = "T.Tester 1.08.4";
-
-const unsigned char AnKat[] MEM_TEXT = {'-', LCD_CHAR_DIODE1, '-', 0};
-const unsigned char KatAn[] MEM_TEXT = {'-', '|', '<', '-', 0};
-const unsigned char Diodes[] MEM_TEXT = {'-', '>', '|', ' ', 0};
-const unsigned char Resistor_str[] MEM_TEXT = {'-', LCD_CHAR_RESIS1, LCD_CHAR_RESIS2, '-', 0};
-
-#ifdef WITH_SELFTEST
-
-const unsigned char URefT[] MEM2_TEXT = "Ref=";
-const unsigned char RHfakt[] MEM2_TEXT = "RHf=";
-const unsigned char RH1L[] MEM_TEXT = "RH-";
-const unsigned char RH1H[] MEM_TEXT = "RH+";
-const unsigned char RLRL[] MEM_TEXT = "+RL- 12 13 23";
-const unsigned char RHRH[] MEM_TEXT = "+RH- 12 13 23";
-const unsigned char RHRL[] MEM_TEXT = "RH/RL";
-const unsigned char R0_str[] MEM2_TEXT = "R0=";
-#define LCD_CLEAR
-#endif
-
-#ifdef CHECK_CALL
-
-const unsigned char RIHI[] MEM_TEXT = "Ri_Hi=";
-const unsigned char RILO[] MEM_TEXT = "Ri_Lo=";
-const unsigned char C0_str[] MEM_TEXT = "C0 ";
-const unsigned char T50HZ[] MEM_TEXT = " 50Hz";
-#endif
-
-#ifdef AUTO_CAL
-
-const unsigned char MinCap_str[] MEM2_TEXT = " >100nF";
-const unsigned char REF_C_str[] MEM2_TEXT = "REF_C=";
-const unsigned char REF_R_str[] MEM2_TEXT = "REF_R=";
-#endif
-
-#ifdef DebugOut
-#define LCD_CLEAR
-#endif
-
 const unsigned char PinRLtab[] PROGMEM = {(1 << (TP1 * 2)), (1 << (TP2 * 2)), (1
         << (TP3 * 2))};  // Table of commands to switch the  R-L resistors Pin 0,1,2
 const unsigned char PinADCtab[] PROGMEM = {(1 << TP1), (1 << TP2),
@@ -995,7 +865,7 @@ unsigned int RHmultip = DEFAULT_RH_FAKT;
 #else
                                                                                                                         // no MAIN_C
   #define COMMON extern
-  #ifdef WITH_SELFTEST
+  #ifdef WITH_SELF_TEST
     extern const unsigned char SELFTEST[] MEM_TEXT;
     extern const unsigned char RELPROBE[] MEM_TEXT;
     extern const unsigned char ATE[] MEM_TEXT;
@@ -1398,22 +1268,28 @@ void setup() {
     mess_count = 0;
 }
 
+int buttonState = 1023;
+
 void loop() {
     start:
+    Serial.println();
+    Serial.println(F("Start case"));
     lcdDraw();
     TestKey = 1;
-    while (TestKey) {
-        TestKey = digitalRead(RST_PIN);
-        delay(100);
-    }
-    while (!TestKey) {
-        TestKey = digitalRead(RST_PIN);
-        delay(100);
-    }
+//    while (TestKey) {
+//        TestKey = digitalRead(RST_PIN);
+//        delay(100);
+//    }
+//    while (!TestKey) {
+//        TestKey = digitalRead(RST_PIN);
+//        delay(100);
+//    }
+    waitForButton();
+    goto trigger;
 
     trigger:
     Serial.println(F("Btn press"));
-    delay(100);
+
     lcdClear();
     delay(100);
 
@@ -1451,7 +1327,7 @@ void loop() {
       //cap.cval = (trans.uBE[0]*4)/10+((BAT_OUT+5)/10); // usually output only 2 digits
       //DisplayValue(cap.cval,-2,'V',2);		// Display 2 Digits of this 10mV units
       cap.cval = (trans.uBE[0]*4)+BAT_OUT;		// usually output only 2 digits
-      DisplayValue(cap.cval,-3,'V',2);			// Display 2 Digits of this 10mV units
+      displayValue(cap.cval,-3,'V',2);			// Display 2 Digits of this 10mV units
       lcdSpace();
     #endif
 
@@ -1519,9 +1395,9 @@ void loop() {
             lcd_line2();
             lcdFixString(VCC_str);            // VCC=
             lcdSpace();
-            DisplayValue(ADCconfig.U_AVCC, -3, 'V', 3);    // Display 3 Digits of this mV units
+            displayValue(ADCconfig.U_AVCC, -3, 'V', 3);    // Display 3 Digits of this mV units
             //lcdSpace();
-            //DisplayValue(RRpinMI,-1,LCD_CHAR_OMEGA,4);
+            //displayValue(RRpinMI,-1,LCD_CHAR_OMEGA,4);
             wait_about1s();
         }
     }
@@ -1542,7 +1418,7 @@ void loop() {
         uart_newline();		// start of new measurement
       #endif
 
-      DisplayValue(trans.uBE[1]*10,-3,'V',3);	// Display 3 Digits of this mV units
+      displayValue(trans.uBE[1]*10,-3,'V',3);	// Display 3 Digits of this mV units
       wait_about300ms();
     }
 #endif
@@ -1649,7 +1525,7 @@ void loop() {
             // load current of capacity is (5V-1.1V)/(470000 Ohm) = 8298nA
             lcdFixString(GateCap_str);            // "C="
             ReadCapacity(diodes[0].Cathode, diodes[0].Anode);    // Capacity opposite flow direction
-            DisplayValue(cap.cval, cap.cpre, 'F', 3);
+            displayValue(cap.cval, cap.cpre, 'F', 3);
             goto end;
 
         } else if (NumOfDiodes == 2) {    // double diode
@@ -1811,7 +1687,7 @@ void loop() {
 #endif
 
         lcdFixString(hfe_str);        // "B="  (hFE)
-        DisplayValue(trans.hfe[0], 0, 0, 3);
+        displayValue(trans.hfe[0], 0, 0, 3);
         lcdSpace();
 
 #if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
@@ -1819,7 +1695,7 @@ void loop() {
 #endif
 
         lcdFixString(Uf_str);        // "Uf="
-        DisplayValue(trans.uBE[0], -3, 'V', 3);
+        displayValue(trans.uBE[0], -3, 'V', 3);
         goto end;
 
         // end (PartFound == PART_TRANSISTOR)
@@ -1888,7 +1764,7 @@ void loop() {
             // Gate capacity
             lcdFixString(GateCap_str);        // "C="
             ReadCapacity(trans.b, trans.e);        // measure capacity
-            DisplayValue(cap.cval, cap.cpre, 'F', 3);
+            displayValue(cap.cval, cap.cpre, 'F', 3);
 
 #if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
             lcd_line4();
@@ -1898,7 +1774,7 @@ void loop() {
         } else {
             lcdFlashString(F("I"));
             lcdFlashString(F("="));
-            DisplayValue(trans.uBE[1], -5, 'A', 2);
+            displayValue(trans.uBE[1], -5, 'A', 2);
 
 #if  defined(NOK5110) || defined(OLED096) || defined(lcdU8)
             lcd_line4();
@@ -1908,7 +1784,7 @@ void loop() {
         }
 
         // Gate-threshold voltage
-        DisplayValue(gthvoltage, -3, 'V', 2);
+        displayValue(gthvoltage, -3, 'V', 2);
         goto end;
 
         // end (PartFound == PART_FET)
@@ -1975,7 +1851,7 @@ void loop() {
 #endif
 
                 lcdFixString(Lis_str);                // "L="
-                DisplayValue(resis[0].lx, resis[0].lpre, 'H', 3);    // output inductance
+                displayValue(resis[0].lx, resis[0].lpre, 'H', 3);    // output inductance
             }
 #endif
 
@@ -2015,12 +1891,12 @@ void loop() {
 #endif
 
             lcdFixString(VLOSS_str);    // "  Vloss="
-            DisplayValue(cap.v_loss, -1, '%', 2);
+            displayValue(cap.v_loss, -1, '%', 2);
         }
 #endif
 
         lcd_line2();  // 2 row
-        DisplayValue(cap.cval_max, cap.cpre_max, 'F', 4);
+        displayValue(cap.cval_max, cap.cpre_max, 'F', 4);
 
 #if FLASHEND > 0x1fff
         cap.esr = GetESR(cap.cb, cap.ca);        // get ESR of capacitor
@@ -2031,7 +1907,7 @@ void loop() {
 #endif
 
             lcdFixString(ESR_str);
-            DisplayValue(cap.esr, -2, LCD_CHAR_OMEGA, 2);
+            displayValue(cap.esr, -2, LCD_CHAR_OMEGA, 2);
         }
 #endif
 
@@ -2076,19 +1952,8 @@ void loop() {
 
     Serial.print(F("Ending 2"));
 //    while (!(ON_PIN_REG & (1 << RST_PIN)));    // wait ,until button is released
-    int buttonState = HIGH;
-    while (1) {
-        buttonState = analogRead(RST_PIN);
-
-        Serial.print(F("State "));
-        Serial.print(buttonState);
-        Serial.println();
-        delay(10);
-        if (buttonState < 980) {
-            return;
-        }
-    }
-    Serial.print(F("Go to start"));
+    waitForButton();
+    Serial.print(F("Go to trigger"));
     goto trigger;
 
     // wait 14 seconds or 5 seconds (if repeat function)
@@ -2153,7 +2018,7 @@ void UfOutput(uint8_t bcdnum) {
 void mVOutput(uint8_t nn) {
     if (nn < 3) {
         // Output in mV units
-        DisplayValue(diodes[nn].Voltage, -3, 'V', 3);
+        displayValue(diodes[nn].Voltage, -3, 'V', 3);
         lcdSpace();
     }
 }
@@ -2165,12 +2030,12 @@ void RvalOut(uint8_t ii) {
     uint16_t rr;
     if ((resis[ii].rx < 100) && (resis[0].lx == 0)) {
         rr = GetESR(resis[ii].ra, resis[ii].rb);
-        DisplayValue(rr, -2, LCD_CHAR_OMEGA, 3);
+        displayValue(rr, -2, LCD_CHAR_OMEGA, 3);
     } else {
-        DisplayValue(resis[ii].rx, -1, LCD_CHAR_OMEGA, 4);
+        displayValue(resis[ii].rx, -1, LCD_CHAR_OMEGA, 4);
     }
 #else
-    DisplayValue(resis[ii].rx,-1,LCD_CHAR_OMEGA,4);
+    displayValue(resis[ii].rx,-1,LCD_CHAR_OMEGA,4);
 #endif
 
     lcdSpace();
@@ -2355,7 +2220,7 @@ void lcd_clear_line(void) {
  *  - unit character (0 = none)
  *  digits = 2, 3 or 4
  */
-void DisplayValue(unsigned long Value, int8_t Exponent, unsigned char Unit, unsigned char digits) {
+void displayValue(unsigned long Value, int8_t Exponent, unsigned char Unit, unsigned char digits) {
     char OutBuffer[15];
     unsigned int Limit;
     unsigned char Prefix;        // prefix character
@@ -2527,7 +2392,7 @@ void PinLayout(char pin1, char pin2, char pin3) {
 /* -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- -=- */
 
 void AutoCheck(void) {
-#ifdef WITH_SELFTEST
+#ifdef WITH_SELF_TEST
 
     uint8_t tt;        // number of running test
     uint8_t ww;        // counter for repeating the tests
@@ -2567,9 +2432,9 @@ void AutoCheck(void) {
     adcmv[1] = GetESR(TP3, TP2);
     adcmv[2] = GetESR(TP2, TP1);
 
-    DisplayValue(adcmv[0], -2, ' ', 3);
-    DisplayValue(adcmv[1], -2, ' ', 3);
-    DisplayValue(adcmv[2], -2, LCD_CHAR_OMEGA, 3);
+    displayValue(adcmv[0], -2, ' ', 3);
+    displayValue(adcmv[1], -2, ' ', 3);
+    displayValue(adcmv[2], -2, LCD_CHAR_OMEGA, 3);
 
     if (adcmv[0] < 60) {
         eeprom_write_byte((uint8_t *) (&EE_ESR_ZEROtab[2]), (int8_t) adcmv[0]);    // fix zero offset
@@ -2606,7 +2471,7 @@ void AutoCheck(void) {
             if (tt == 1) {        // output of reference voltage and factors for capacity measurement
                 Calibrate_UR();        // get Reference voltage, Pin resistance
                 lcd_fix2_string(URefT);    // "URef="
-                DisplayValue(ref_mv, -3, 'V', 4);
+                displayValue(ref_mv, -3, 'V', 4);
                 lcd_line2();                // Cursor to column 1, row 2
                 lcd_fix2_string(RHfakt);        // "RHf="
                 lcdString(utoa(RHmultip, outval, 10));
@@ -2726,10 +2591,10 @@ void AutoCheck(void) {
 
     lcdClear();
     lcdFixString(RIHI);                // "RiHi="
-    DisplayValue(RRpinPL, -1, LCD_CHAR_OMEGA, 3);
+    displayValue(RRpinPL, -1, LCD_CHAR_OMEGA, 3);
     lcd_line2();
     lcdFixString(RILO);                // "RiLo="
-    DisplayValue(RRpinMI, -1, LCD_CHAR_OMEGA, 3);
+    displayValue(RRpinMI, -1, LCD_CHAR_OMEGA, 3);
     wait_about2s();
 
     //measure Zero offset for Capacity measurement
@@ -2750,9 +2615,9 @@ void AutoCheck(void) {
 
     lcdClear();
     lcdFixString(C0_str);            // output "C0 "
-    DisplayValue(adcmv[5], 0, ' ', 3);        // output cap0 1:3
-    DisplayValue(adcmv[6], 0, ' ', 3);        // output cap0 2:3
-    DisplayValue(adcmv[2], -12, 'F', 3);        // output cap0 1:2
+    displayValue(adcmv[5], 0, ' ', 3);        // output cap0 1:3
+    displayValue(adcmv[6], 0, ' ', 3);        // output cap0 2:3
+    displayValue(adcmv[2], -12, 'F', 3);        // output cap0 1:2
 
 #ifdef AUTO_CAL
     for (ww = 0; ww < 7; ww++) {
@@ -2835,7 +2700,7 @@ void AutoCheck(void) {
               R_DDR = 0;				// Pin 3 without current
               lcd_line4();
               adcmv[0] = ReadADC(TP3);
-              DisplayValue(adcmv[0],-3,'V',4);
+              displayValue(adcmv[0],-3,'V',4);
               wait_about1s();
             }
 #endif
@@ -2877,7 +2742,7 @@ void AutoCheck(void) {
         }
 
         lcd_line2();
-        DisplayValue(cap.cval, cap.cpre, 'F', 4);
+        displayValue(cap.cval, cap.cpre, 'F', 4);
         wait_about200ms();            // wait additional time
 
     }  // end for ww
@@ -3934,7 +3799,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
         DisplayValue(lirx1,1,LCD_CHAR_OMEGA,4)
         lcdSpace();
         lcd_data('Y');
-        DisplayValue(lirx2,1,LCD_CHAR_OMEGA,4)
+        displayValue(lirx2,1,LCD_CHAR_OMEGA,4)
         lcdSpace();
       } else {
         lcdData('x');
@@ -3970,7 +3835,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
             lcdData('=');
             DisplayValue(thisR->rx,-1,LCD_CHAR_OMEGA,3)
             lcdSpace();
-            DisplayValue(lirx1,-1,LCD_CHAR_OMEGA,3)
+            displayValue(lirx1,-1,LCD_CHAR_OMEGA,3)
             lcdSpace();
 #endif
 
@@ -4059,7 +3924,7 @@ void GetIr(uint8_t hipin, uint8_t lopin) {
 
     // R_H_VAL has units of 10 Ohm, u_res has units of mV, ir_nano has units of nA
     ir_nano = (unsigned long) (u_res * 100000UL) / R_H_VAL;
-    DisplayValue(ir_nano, -9, 'A', 2);    // output two digits of current with nA units
+    displayValue(ir_nano, -9, 'A', 2);    // output two digits of current with nA units
 
 #ifdef WITH_IRMICRO
                                                                                                                             } else {
@@ -4068,7 +3933,7 @@ void GetIr(uint8_t hipin, uint8_t lopin) {
       ir_nano = 0xffff;			// set to max
       // RR680MI has units of 0.1 Ohm, u_res has units of mV, ir_micro has units of uA
       ir_micro = (unsigned long)(u_res * 10000UL) / RR680MI;
-      DisplayValue(ir_micro,-6,'A',2);	// output two digits of current in uA units
+      displayValue(ir_micro,-6,'A',2);	// output two digits of current in uA units
     }
 #endif
 
@@ -4327,7 +4192,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     //wdt_reset();
 
 #if DebugOut == 10
-                                                                                                                            DisplayValue(ovcnt16,0,' ',4);
+                                                                                                                            displayValue(ovcnt16,0,' ',4);
     DisplayValue(adcv[2],-3,'V',4);
 #endif
 
@@ -4456,7 +4321,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     lcdData('C');
     lcd_testpin(HighPin);
     lcdSpace();
-    DisplayValue(cap.cval,cap.cpre,'F',4);
+    displayValue(cap.cval,cap.cpre,'F',4);
     lcdSpace();
     lcd_string(utoa(ovcnt16,outval,10));
     wait_about3s();
@@ -4632,7 +4497,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     lcdData('c');
     lcd_testpin(HighPin);
     lcdSpace();
-    DisplayValue(cap.cval,cap.cpre,'F',4);
+    displayValue(cap.cval,cap.cpre,'F',4);
     wait_about3s();
 #endif
 
@@ -4997,7 +4862,7 @@ void ReadInductance(void) {
         lcd_line3();
         DisplayValue(count,0,' ',4);
         DisplayValue(timeconstant.dw,0,'+',4);
-        DisplayValue(cnt_diff,0,' ',4);
+        displayValue(cnt_diff,0,' ',4);
         DisplayValue(total_r,-1,'r',4);
         lcdSpace();
         DisplayValue(per_ref1,-1,'%',4);
@@ -5408,7 +5273,7 @@ uint16_t GetESR(uint8_t hipin, uint8_t lopin) {
     lcdData(' ');
     DisplayValue(sumvolt[0],0,'L',4);	// LowPin 1
     lcd_line3();
-    DisplayValue(sumvolt[1],0,'h',4);	// HighPin 1
+    displayValue(sumvolt[1],0,'h',4);	// HighPin 1
     lcd_data(' ');
     DisplayValue(sumvolt[3],0,'H',4);	// LowPin 2
     lcd_line4();
@@ -5425,7 +5290,7 @@ uint16_t GetESR(uint8_t hipin, uint8_t lopin) {
     }
 
 #ifdef ESR_DEBUG
-                                                                                                                            DisplayValue(sumvolt[2],0,'d',4);	// HighPin - LowPin
+                                                                                                                            displayValue(sumvolt[2],0,'d',4);	// HighPin - LowPin
     lcdData(' ');
 #endif
 
@@ -5578,7 +5443,7 @@ void GetVloss() {
     DisplayValue(adcv[2],0,' ',4);
     DisplayValue(adcv[1],0,' ',4);
     lcd_line4();
-    DisplayValue(lval.w[0],0,'x',4);
+    displayValue(lval.w[0],0,'x',4);
 #endif
 
     // discharge capacitor again
@@ -5830,4 +5695,19 @@ void serialPut(uint8_t data) {
 }
 
 
-#endif
+void waitForButton() {
+    pinMode(RST_PIN, INPUT);
+    buttonState = 1023;
+    while (1) {
+        buttonState = analogRead(RST_PIN);
+
+        Serial.print(F("State "));
+        Serial.print(buttonState);
+        Serial.println();
+        delay(10);
+        if (buttonState < 980) {
+            return;
+        }
+    }
+}
+

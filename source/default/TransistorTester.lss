@@ -1089,7 +1089,7 @@ void DisplayValue(unsigned long Value, int8_t Exponent, unsigned char Unit, unsi
      5b0:	d3 04       	cpc	r13, r3
      5b2:	e4 04       	cpc	r14, r4
      5b4:	f5 04       	cpc	r15, r5
-     5b6:	28 f7       	brcc	.-54     	; 0x582 <DisplayValue+0x54>
+     5b6:	28 f7       	brcc	.-54     	; 0x582 <displayValue+0x54>
 
 
   /*

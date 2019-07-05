@@ -40,7 +40,7 @@ UI_LANGUAGE = LANG_ENGLISH
 # The connection of LCD is totally different for both versions.
 CFLAGS += -DSTRIP_GRID_BOARD
 
-# The WITH_SELFTEST option enables selftest function (only for mega168 or mega328).
+# The WITH_SELF_TEST option enables selftest function (only for mega168 or mega328).
 CFLAGS += -DWITH_SELFTEST
 
 # AUTO_CAL will enable the autocalibration of zero offset of capacity measurement and

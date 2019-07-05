@@ -159,7 +159,7 @@ start:
 //  cap.cval = (trans.uBE[0]*4)/10+((BAT_OUT+5)/10); // usually output only 2 digits
 //  DisplayValue(cap.cval,-2,'V',2);		// Display 2 Digits of this 10mV units
   cap.cval = (trans.uBE[0]*4)+BAT_OUT;		// usually output only 2 digits
-  DisplayValue(cap.cval,-3,'V',2);		// Display 2 Digits of this 10mV units
+  displayValue(cap.cval,-3,'V',2);		// Display 2 Digits of this 10mV units
   lcd_space();
  #endif
  #if (BAT_POOR > 12000)
@@ -217,7 +217,7 @@ start:
          lcdFixString(VCC_str);		// VCC=
          DisplayValue(ADCconfig.U_AVCC,-3,'V',3);	// Display 3 Digits of this mV units
 //         lcd_space();
-//         DisplayValue(RRpinMI,-1,LCD_CHAR_OMEGA,4);
+//         displayValue(RRpinMI,-1,LCD_CHAR_OMEGA,4);
          wait_about1s();
      }
   }
@@ -235,7 +235,7 @@ start:
 #ifdef WITH_UART
      uart_newline();		// start of new measurement
 #endif
-     DisplayValue(trans.uBE[1]*10,-3,'V',3);	// Display 3 Digits of this mV units
+      displayValue(trans.uBE[1] * 10, -3, 'V', 3);	// Display 3 Digits of this mV units
      wait_about300ms();
   }
 #endif
@@ -324,7 +324,7 @@ start:
         /* load current of capacity is (5V-1.1V)/(470000 Ohm) = 8298nA */
          lcdFixString(GateCap_str);	//"C="
         ReadCapacity(diodes[0].Cathode,diodes[0].Anode);	// Capacity opposite flow direction
-        DisplayValue(cap.cval,cap.cpre,'F',3);
+         displayValue(cap.cval, cap.cpre, 'F', 3);
         goto end;
      } else if(NumOfDiodes == 2) { // double diode
          lcdData('2');
@@ -468,11 +468,11 @@ start:
     PinLayout('E','B','C'); 		//  EBC= or 123=...
     lcd_line2(); //2. row 
       lcdFixString(hfe_str);		//"B="  (hFE)
-    DisplayValue(trans.hfe[0],0,0,3);
+      displayValue(trans.hfe[0], 0, 0, 3);
     lcd_space();
 
       lcdFixString(Uf_str);		//"Uf="
-    DisplayValue(trans.uBE[0],-3,'V',3);
+      displayValue(trans.uBE[0], -3, 'V', 3);
     goto end;
     // end (PartFound == PART_TRANSISTOR)
   } else if (PartFound == PART_FET) {	//JFET or MOSFET
@@ -521,16 +521,16 @@ start:
 	//Gate capacity
         lcdFixString(GateCap_str);		//"C="
        ReadCapacity(trans.b,trans.e);	//measure capacity
-       DisplayValue(cap.cval,cap.cpre,'F',3);
+        displayValue(cap.cval, cap.cpre, 'F', 3);
         lcdFixString(vt_str);		// "Vt="
     } else {
         lcdData('I');
         lcdData('=');
-       DisplayValue(trans.uBE[1],-5,'A',2);
+        displayValue(trans.uBE[1], -5, 'A', 2);
         lcdFixString(Vgs_str);		// " Vgs="
     }
     //Gate-threshold voltage
-    DisplayValue(gthvoltage,-3,'V',2);
+      displayValue(gthvoltage, -3, 'V', 2);
     goto end;
     // end (PartFound == PART_FET)
   } else if (PartFound == PART_THYRISTOR) {
@@ -583,7 +583,7 @@ start:
        if (resis[0].lx != 0) {
 	  // resistor have also Inductance
           lcdFixString(Lis_str);	// "L="
-          DisplayValue(resis[0].lx,resis[0].lpre,'H',3);	// output inductance
+          displayValue(resis[0].lx,resis[0].lpre,'H',3);	// output inductance
        }
 #endif
     } else {
@@ -615,16 +615,16 @@ start:
      GetVloss();			// get Voltage loss of capacitor
      if (cap.v_loss != 0) {
         lcdFixString(VLOSS_str);	// "  Vloss="
-        DisplayValue(cap.v_loss,-1,'%',2);
+        displayValue(cap.v_loss,-1,'%',2);
      }
 #endif
      lcd_line2(); 			//2. row 
-     DisplayValue(cap.cval_max,cap.cpre_max,'F',4);
+      displayValue(cap.cval_max, cap.cpre_max, 'F', 4);
 #if FLASHEND > 0x1fff
      cap.esr = GetESR(cap.cb, cap.ca);		// get ESR of capacitor
      if ( cap.esr < 65530) {
         lcdFixString(ESR_str);
-        DisplayValue(cap.esr,-2,LCD_CHAR_OMEGA,2);
+        displayValue(cap.esr,-2,LCD_CHAR_OMEGA,2);
      }
 #endif
      goto end;
@@ -715,7 +715,7 @@ void UfAusgabe(uint8_t bcdnum) {
 void mVAusgabe(uint8_t nn) {
    if (nn < 3) {
       // Output in mV units
-      DisplayValue(diodes[nn].Voltage,-3,'V',3);
+       displayValue(diodes[nn].Voltage, -3, 'V', 3);
       lcd_space();
    }
 }
@@ -728,10 +728,10 @@ void RvalOut(uint8_t ii) {
       rr = GetESR(resis[ii].ra,resis[ii].rb);
       DisplayValue(rr,-2,LCD_CHAR_OMEGA,3);
    } else {
-      DisplayValue(resis[ii].rx,-1,LCD_CHAR_OMEGA,4);
+      displayValue(resis[ii].rx,-1,LCD_CHAR_OMEGA,4);
    }
 #else
-   DisplayValue(resis[ii].rx,-1,LCD_CHAR_OMEGA,4);
+    displayValue(resis[ii].rx, -1, LCD_CHAR_OMEGA, 4);
 #endif
    lcd_space();
  }
@@ -895,7 +895,7 @@ void lcd_clear_line(void) {
  *  - unit character (0 = none)
  *  digits = 2, 3 or 4
  */
-void DisplayValue(unsigned long Value, int8_t Exponent, unsigned char Unit, unsigned char digits)
+void displayValue(unsigned long Value, int8_t Exponent, unsigned char Unit, unsigned char digits)
 {
   char OutBuffer[15];
   unsigned int      Limit;

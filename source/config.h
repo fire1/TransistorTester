@@ -507,7 +507,7 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #endif
 
 #undef CHECK_CALL
-#ifdef WITH_SELFTEST
+#ifdef WITH_SELF_TEST
  // AutoCheck Function is needed
  #define CHECK_CALL
 #endif

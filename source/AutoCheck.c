@@ -1,5 +1,5 @@
 void AutoCheck(void) {
-#ifdef WITH_SELFTEST
+#ifdef WITH_SELF_TEST
   uint8_t tt;		// number of running test
   uint8_t ww;		// counter for repeating the tests
   int  adcmv[7];
