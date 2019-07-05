@@ -72,4 +72,6 @@ void unloadingPins();
 
 void waitForButton();
 
+void AutoCheck(void);
+
 #endif //TRANSISTORTESTER_TRANSISTORTESTER_H

@@ -71,7 +71,9 @@
 #endif
 
 #endif
+
 #include "language.h"
+
 #define AUTO_CAL
 // ******** config options for your Semiconductor tester
 
@@ -675,41 +677,6 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #endif
 
 
-#ifdef INHIBIT_SLEEP_MODE
-                                                                                                                        // save memory, do not use the sleep mode
-  #define wait_about5ms() wait5ms()
-  #define wait_about10ms() wait10ms()
-  #define wait_about20ms() wait20ms()
-  #define wait_about30ms() wait30ms()
-  #define wait_about50ms() wait50ms()
-  #define wait_about100ms() wait100ms()
-  #define wait_about200ms() wait200ms()
-  #define wait_about300ms() wait300ms()
-  #define wait_about400ms() wait400ms()
-  #define wait_about500ms() wait500ms()
-  #define wait_about1s() wait1s()
-  #define wait_about2s() wait2s()
-  #define wait_about3s() wait3s()
-  #define wait_about4s() wait4s()
-#else
-// use sleep mode to save current for user interface
-#define wait_about5ms() sleep_5ms(1)
-#define wait_about10ms() sleep_5ms(2)
-#define wait_about20ms() sleep_5ms(4)
-#define wait_about30ms() sleep_5ms(6)
-#define wait_about50ms() sleep_5ms(10)
-#define wait_about100ms() sleep_5ms(20)
-#define wait_about200ms() sleep_5ms(40)
-#define wait_about300ms() sleep_5ms(60)
-#define wait_about400ms() sleep_5ms(80)
-#define wait_about500ms() sleep_5ms(100)
-#define wait_about1s() sleep_5ms(200)
-#define wait_about2s() sleep_5ms(400)
-#define wait_about3s() sleep_5ms(600)
-#define wait_about4s() sleep_5ms(800)
-#endif
-
-
 #undef AUTO_RH
 #ifdef WITH_AUTO_REF
 #define AUTO_RH
@@ -758,8 +725,6 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 // unset the option for the 123 selection, since this style is default.
 #undef EBC_STYLE
 #endif
-
-
 
 
 #endif  // #ifndef ADC_PORT
@@ -1084,7 +1049,7 @@ EMPTY_INTERRUPT(ADC_vect);
 uint8_t tmp = 0;
 //unsigned int PRR;
 
-byte TestKey;
+
 
 
 #ifdef LCD1602
@@ -1229,7 +1194,7 @@ void setup() {
         // can happen, if any loop in the Program doen't finish.
         lcd_line1();
         lcdFixString(TestTimedOut);    // Output Timeout
-        wait_about2s();            // wait for 3 s
+        delay(2000);;            // wait for 3 s
         //ON_PORT = 0;			// shut off!
         //ON_DDR = (1<<ON_PIN);		// switch to GND
         //return;
@@ -1251,7 +1216,7 @@ void setup() {
     display_time = OFF_WAIT_TIME;		// LONG_WAIT_TIME for single mode, else SHORT_WAIT_TIME
     if (!(ON_PIN_REG & (1<<RST_PIN))) {
       // if power button is pressed ...
-      wait_about300ms();			// wait to catch a long key press
+      delay(300);;			// wait to catch a long key press
       if (!(ON_PIN_REG & (1<<RST_PIN))) {
         // check if power button is still pressed
         display_time = LONG_WAIT_TIME;		// ... set long time display anyway
@@ -1275,15 +1240,6 @@ void loop() {
     Serial.println();
     Serial.println(F("Start case"));
     lcdDraw();
-    TestKey = 1;
-//    while (TestKey) {
-//        TestKey = digitalRead(RST_PIN);
-//        delay(100);
-//    }
-//    while (!TestKey) {
-//        TestKey = digitalRead(RST_PIN);
-//        delay(100);
-//    }
     waitForButton();
     goto trigger;
 
@@ -1315,62 +1271,8 @@ void loop() {
     ADCconfig.U_Bandgap = ADC_internal_reference;  // set internal reference voltage for ADC
 
 #ifdef BAT_CHECK
-                                                                                                                            // Battery check is selected
-    ReadADC(TPBAT);			// Dummy-Readout
-    trans.uBE[0] = W5msReadADC(TPBAT); 	// with 5V reference
-    lcd_fix_string(Bat_str);		// output: "Bat. "
-
-    #ifdef BAT_OUT
-      // display Battery voltage
-      // The divisor to get the voltage in 0.01V units is ((10*33)/133) witch is about 2.4812
-      // A good result can be get with multiply by 4 and divide by 10 (about 0.75%).
-      //cap.cval = (trans.uBE[0]*4)/10+((BAT_OUT+5)/10); // usually output only 2 digits
-      //DisplayValue(cap.cval,-2,'V',2);		// Display 2 Digits of this 10mV units
-      cap.cval = (trans.uBE[0]*4)+BAT_OUT;		// usually output only 2 digits
-      displayValue(cap.cval,-3,'V',2);			// Display 2 Digits of this 10mV units
-      lcdSpace();
-    #endif
-
-    #if (BAT_POOR > 12000)
-      #warning "Battery POOR level is set very high!"
-    #endif
-    #if (BAT_POOR < 2500)
-      #warning "Battery POOR level is set very low!"
-    #endif
-
-    #if (BAT_POOR > 5300)
-      // use .8 V difference to Warn-Level
-      #define WARN_LEVEL (((unsigned long)(BAT_POOR+800)*(unsigned long)33)/133)
-    #elif (BAT_POOR > 3249)
-      // less than 5.4 V only .4V difference to Warn-Level
-      #define WARN_LEVEL (((unsigned long)(BAT_POOR+400)*(unsigned long)33)/133)
-    #elif (BAT_POOR > 1299)
-      // less than 2.9 V only .2V difference to Warn-Level
-      #define WARN_LEVEL (((unsigned long)(BAT_POOR+200)*(unsigned long)33)/133)
-    #else
-      // less than 1.3 V only .1V difference to Warn-Level
-      #define WARN_LEVEL (((unsigned long)(BAT_POOR+100)*(unsigned long)33)/133)
-    #endif
-
-    #define POOR_LEVEL (((unsigned long)(BAT_POOR)*(unsigned long)33)/133)
-
-    // check the battery voltage
-    if (trans.uBE[0] <  WARN_LEVEL) {
-
-      // Vcc < 7,3V; show Warning
-      if(trans.uBE[0] < POOR_LEVEL) {
-        // Vcc <6,3V; no proper operation is possible
-        lcd_fix_string(BatEmpty);	// Battery empty!
-        wait_about2s();
-        PORTD = 0;			// switch power off
-        return;
-      }
-
-      lcd_fix_string(BatWeak);		// Battery weak
-    } else {                            // Battery-voltage OK
-      lcdFixString(OK_str); 		// "OK"
-    }
-
+    // Battery check is selected
+batteryCheck();
 #else
     lcdPgmString(VERSION_str);    // if no Battery check, Version .. in row 1
 #endif
@@ -1379,7 +1281,7 @@ void loop() {
     //wdt_enable(WDTO_2S);		// Watchdog on
 #endif
 
-    //wait_about1s();			// add more time for reading batterie voltage
+    //delay(1000);;			// add more time for reading batterie voltage
 
     // begin tests
 
@@ -1398,30 +1300,11 @@ void loop() {
             displayValue(ADCconfig.U_AVCC, -3, 'V', 3);    // Display 3 Digits of this mV units
             //lcdSpace();
             //displayValue(RRpinMI,-1,LCD_CHAR_OMEGA,4);
-            wait_about1s();
+            delay(1000);
         }
     }
 #endif
 
-#ifdef WITH_VEXT
-                                                                                                                                // show the external voltage
-    while (!(ON_PIN_REG & (1<<RST_PIN))) {
-      lcd_line2();
-      lcd_clear_line();
-      lcd_line2();
-      lcdFixString(Vext_str);			// Vext=
-      ADC_DDR = 0;				// deactivate Software-UART
-      trans.uBE[1] = W5msReadADC(TPext);	// read external voltage
-      ADC_DDR = TXD_MSK;			// activate Software-UART
-
-      #ifdef WITH_UART
-        uart_newline();		// start of new measurement
-      #endif
-
-      displayValue(trans.uBE[1]*10,-3,'V',3);	// Display 3 Digits of this mV units
-      wait_about300ms();
-    }
-#endif
 
     lcd_line3();            // LCD position row 2, column 1
     lcdFixString(TestRunning);    // String: testing...
@@ -1964,7 +1847,7 @@ void loop() {
             goto start;
         }
 //        wdt_reset();
-        wait_about10ms();
+        delay(10);;
     }
 
 #ifdef POWER_OFF
@@ -1990,7 +1873,7 @@ void loop() {
         goto start;
       }
       wdt_reset();
-      wait_about10ms();
+      delay(10);;
     }
 
 #else
@@ -2057,7 +1940,7 @@ void ChargePin10ms(uint8_t PinToCharge, uint8_t ChargeDirection) {
     }
 
     R_DDR |= PinToCharge;            // switch Pin to output, across R to GND or VCC
-    wait_about10ms();            // wait about 10ms
+    delay(10);            // wait about 10ms
     // switch back Input, no current
     R_DDR &= ~PinToCharge;        // switch back to input
     R_PORT &= ~PinToCharge;        // no Pull up
@@ -2447,7 +2330,7 @@ void AutoCheck(void) {
     }
 
     for (tt = 0; tt < 12; tt++) {
-        wait_about500ms();
+        delay(500);
 
         if (!(ON_PIN_REG & (1 << RST_PIN))) {
             // if key is pressed, don't repeat
@@ -2576,16 +2459,16 @@ void AutoCheck(void) {
                 // if key is pressed, don't repeat
                 break;
             }
-            wait_about500ms();
+            delay(500);
 
             if (!(ON_PIN_REG & (1 << RST_PIN))) {
                 // if key is pressed, don't repeat
                 break;
             }
-            wait_about500ms();
+            delay(500);
 
         }  // end for ww
-        wait_about1s();
+        delay(1000);;
 
     }  // end for tt
 
@@ -2595,7 +2478,7 @@ void AutoCheck(void) {
     lcd_line2();
     lcdFixString(RILO);                // "RiLo="
     displayValue(RRpinMI, -1, LCD_CHAR_OMEGA, 3);
-    wait_about2s();
+    delay(2000);;
 
     //measure Zero offset for Capacity measurement
     adcmv[3] = 0;
@@ -2636,7 +2519,7 @@ void AutoCheck(void) {
     no_c0save:
 #endif
 
-    wait_about2s();
+    delay(2000);
 
 #ifdef AUTO_CAL
     // Message C > 100nF
@@ -2701,7 +2584,7 @@ void AutoCheck(void) {
               lcd_line4();
               adcmv[0] = ReadADC(TP3);
               displayValue(adcmv[0],-3,'V',4);
-              wait_about1s();
+              delay(1000);;
             }
 #endif
 
@@ -2737,13 +2620,13 @@ void AutoCheck(void) {
             lcdString(itoa(udiff2, outval, 10));    // output correction voltage
 #endif
 
-            wait_about4s();
+            delay(4000);;
             break;
         }
 
         lcd_line2();
         displayValue(cap.cval, cap.cpre, 'F', 4);
-        wait_about200ms();            // wait additional time
+        delay(200);           // wait additional time
 
     }  // end for ww
 #endif
@@ -2792,7 +2675,7 @@ void AutoCheck(void) {
 #endif
 
     PartFound = PART_NONE;
-    wait_about1s();
+    delay(1000);;
 #endif
 }
 
@@ -2981,7 +2864,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
       lcdData('F');
       lcd_testpin(HighPin);
       lcdSpace();
-      wait_about1s();
+      delay(1000);;
 #endif
 
         // Test if N-JFET or if self-conducting N-MOSFET
@@ -3100,7 +2983,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
     R_PORT = 0;            // switch all resistor ports to GND
     ADC_DDR = HiADCm;        // switch High-Pin to output
     ADC_PORT = HiADCp;        // switch High-Pin to VCC
-    wait_about5ms();
+    delay(5);;
 
     if (adc.lp_otr < 977) {
         // if the component has no connection between  HighPin and LowPin
@@ -3110,7 +2993,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
       lcdData('P');
       lcd_testpin(HighPin);
       lcdSpace();
-      wait_about1s();
+      delay(1000);;
 #endif
 
         // Test to PNP
@@ -3256,7 +3139,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
         lcd_data('T');
         lcd_data('P');
         lcd_string(utoa(adc.tp1,outval,10));
-        wait_about1s();
+        delay(1000);;
 #endif
 #endif
 
@@ -3275,7 +3158,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
         lcdData('N');
         lcd_testpin(HighPin);
         lcdSpace();
-        wait_about1s();
+        delay(1000);;
 #endif
 
             if (PartReady == 1) {
@@ -3290,7 +3173,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
             // no Thyristor or holding current to low
 
             R_PORT = 0;            // switch R_L for High-Pin (probably Anode) to GND (turn off)
-            wait_about5ms();
+            delay(5);;
             R_PORT = HiPinRL;            // switch R_L for High-Pin (probably Anode) again to VCC
             adc.hp2 = W5msReadADC(HighPin);    // measure voltage at the High-Pin (probably Anode) again
 
@@ -3303,7 +3186,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
                 R_DDR = 0;
                 R_PORT = 0;
                 ADC_PORT = LoADCp;        // Low-Pin fix to VCC
-                wait_about5ms();
+                delay(5);;
 
                 R_DDR = HiPinRL;        // switch R_L port HighPin to output (GND)
                 if (W5msReadADC(HighPin) > 244) {
@@ -3328,7 +3211,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
                 }
 
                 R_PORT = HiPinRL;        // switch R_L port for HighPin to VCC => switch off holding current
-                wait_about5ms();
+                delay(5);;
                 R_PORT = 0;            // switch R_L port for HighPin again to GND; Triac should now switched off
                 if (W5msReadADC(HighPin) > 244) {
                     goto savenresult;        // measure voltage at the High-Pin (probably A2) ;
@@ -3344,7 +3227,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
             //ADC_DDR = LoADCm;		// Low-Pin to output 0V
             R_DDR = HiPinRL | TriPinRH;    // R_H port of Tristate-Pin (Basis) to output
             R_PORT = HiPinRL | TriPinRH;    // R_H port of Tristate-Pin (Basis) to VCC
-            wait_about50ms();
+            delay(50);;
             adc.hp2 = ADCconfig.U_AVCC - ReadADC(HighPin);        // measure the voltage at the collector resistor
             adc.tp2 = ADCconfig.U_AVCC - ReadADC(TristatePin);    // measure the voltage at the base resistor
 
@@ -3425,7 +3308,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
             lcd_line3();
             lcd_data('N');
             lcdData('F');
-            wait_about1s();
+            delay(1000);;
 #endif
 
                     // Switching of Drain is monitored with digital input
@@ -3475,7 +3358,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
 
     for (ii = 0; ii < 200; ii++) {
         ADC_DDR = LoADCm | HiADCm;    // discharge by short of Low and High side
-        wait_about5ms();                // Low and Highpin to GND for discharge
+        delay(5);;                // Low and Highpin to GND for discharge
         ADC_DDR = LoADCm;                // switch only Low-Pin fix to GND
         adc.hp1 = ReadADC(HighPin);    // read voltage at High-Pin
         if (adc.hp1 < (150 / 8)) break;
@@ -3562,7 +3445,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
     lcdData('H');
     lcd_string(utoa(adc.hp2,outval,10));
     lcdSpace();
-    wait_about1s();
+    delay(1000);;
 #endif
 
     //if((adc.hp1 > 150) && (adc.hp1 < 4640) && (adc.hp1 > (adc.hp3+(adc.hp3/8))) && (adc.hp3*8 > adc.hp1)) {
@@ -3879,7 +3762,7 @@ void CheckPins(uint8_t HighPin, uint8_t LowPin, uint8_t TristatePin) {
 
 #ifdef DebugOut
                                                                                                                             #if DebugOut < 10
-      wait_about2s();
+      delay(2000);;
     #endif
 #endif
 
@@ -3984,7 +3867,7 @@ unsigned int ReadADC(uint8_t Probe) {
 #ifdef NO_AREF_CAP
         wait100us();        // time for voltage stabilization
 #else
-        wait_about10ms();    // time for voltage stabilization
+        delay(10);;    // time for voltage stabilization
 #endif
     }
 #endif
@@ -4037,17 +3920,17 @@ unsigned int ReadADC(uint8_t Probe) {
 }
 
 unsigned int W5msReadADC(uint8_t Probe) {
-    wait_about5ms();
+    delay(5);;
     return (ReadADC(Probe));
 }
 
 unsigned int W10msReadADC(uint8_t Probe) {
-    wait_about10ms();
+    delay(10);;
     return (ReadADC(Probe));
 }
 
 unsigned int W20msReadADC(uint8_t Probe) {
-    wait_about20ms();
+    delay(20);;
     return (ReadADC(Probe));
 }
 
@@ -4121,7 +4004,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 
 #if DebugOut == 10
         lcdData('R');
-      wait_about2s();
+      delay(2000);;
 #endif
 
         return;    // We have found a resistor already
@@ -4132,7 +4015,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 
 #if DebugOut == 10
             lcdData('D');
-        wait_about2s();
+        delay(2000);;
 #endif
 
             return;
@@ -4231,7 +4114,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
       lcd_data(':');
       lcd_string(utoa(adcv[3],outval,10));
       lcdSpace();
-      wait_about2s();
+      delay(2000);;
     #endif
 
     if ((adcv[3] + adcv[3]) < adcv[2]) {
@@ -4239,7 +4122,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
       #if DebugOut == 10
         lcdData('H');
         lcdSpace();
-        wait_about1s();
+        delay(1000);;
       #endif
 
       if (ovcnt16 == 0 )  {
@@ -4290,7 +4173,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 #if DebugOut == 10
                                                                                                                                 lcdData('L');
         lcdSpace();
-        wait_about1s();
+        delay(1000);;
 #endif
 
         if (ovcnt16 == 0) {
@@ -4324,7 +4207,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     displayValue(cap.cval,cap.cpre,'F',4);
     lcdSpace();
     lcd_string(utoa(ovcnt16,outval,10));
-    wait_about3s();
+    delay(3000);;
 #endif
 
     goto checkDiodes;
@@ -4438,7 +4321,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 
 #if DebugOut == 10
                                                                                                                                 lcdData('k');
-      wait_about1s();
+      delay(1000);;
 #endif
 
         goto keinC;    // no normal end
@@ -4498,7 +4381,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
     lcd_testpin(HighPin);
     lcdSpace();
     displayValue(cap.cval,cap.cpre,'F',4);
-    wait_about3s();
+    delay(3000);;
 #endif
 
     R_DDR = HiPinR_L;        // switch R_L for High-Pin to GND
@@ -4514,7 +4397,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 #if DebugOut == 10
                                                                                                                                 lcdData('<');
         lcdSpace();
-        wait_about1s();
+        delay(1000);;
 #endif
 
         goto keinC;  // capacity to low, < 50pF @1MHz (25pF @8MHz)
@@ -4529,7 +4412,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 #if DebugOut == 10
                                                                                                                                 lcdData('D');
       lcdSpace();
-      wait_about1s();
+      delay(1000);;
 #endif
 
         // nearly shure, that there is one or more diodes in reverse direction,
@@ -4872,8 +4755,8 @@ void ReadInductance(void) {
         DisplayValue(umax,-3,'V',4);
         lcdSpace();
         DisplayValue(per_ref2,-1,'%',4);
-        wait_about4s();
-        wait_about2s();
+        delay(4000);;
+        delay(2000);;
       }
 #endif
 
@@ -4892,7 +4775,7 @@ void ReadInductance(void) {
     }  // end for count
 
     ADC_PORT = TXD_VAL;        // switch ADC Port to GND
-    wait_about20ms();
+    delay(20);;
 
 #if 0
                                                                                                                             if (inductance[1] > inductance[0]) {
@@ -5163,7 +5046,7 @@ uint16_t GetESR(uint8_t hipin, uint8_t lopin) {
 #ifdef NO_AREF_CAP
     wait100us();        // time for voltage stabilization
 #else
-    wait_about10ms();        // time for voltage stabilization with 100nF
+    delay(10);;        // time for voltage stabilization with 100nF
 #endif
 
     // start voltage must be negativ
@@ -5711,3 +5594,61 @@ void waitForButton() {
     }
 }
 
+void batteryCheck() {
+#ifdef BAT_CHECK
+    ReadADC(TPBAT);			// Dummy-Readout
+    trans.uBE[0] = W5msReadADC(TPBAT); 	// with 5V reference
+    lcdPgmString(Bat_str);		// output: "Bat. "
+
+#ifdef BAT_OUT
+    // display Battery voltage
+      // The divisor to get the voltage in 0.01V units is ((10*33)/133) witch is about 2.4812
+      // A good result can be get with multiply by 4 and divide by 10 (about 0.75%).
+      //cap.cval = (trans.uBE[0]*4)/10+((BAT_OUT+5)/10); // usually output only 2 digits
+      //DisplayValue(cap.cval,-2,'V',2);		// Display 2 Digits of this 10mV units
+      cap.cval = (trans.uBE[0]*4)+BAT_OUT;		// usually output only 2 digits
+      displayValue(cap.cval,-3,'V',2);			// Display 2 Digits of this 10mV units
+      lcdSpace();
+#endif
+
+#if (BAT_POOR > 12000)
+#warning "Battery POOR level is set very high!"
+#endif
+#if (BAT_POOR < 2500)
+#warning "Battery POOR level is set very low!"
+#endif
+
+#if (BAT_POOR > 5300)
+    // use .8 V difference to Warn-Level
+#define WARN_LEVEL (((unsigned long)(BAT_POOR+800)*(unsigned long)33)/133)
+#elif (BAT_POOR > 3249)
+    // less than 5.4 V only .4V difference to Warn-Level
+#define WARN_LEVEL (((unsigned long)(BAT_POOR+400)*(unsigned long)33)/133)
+#elif (BAT_POOR > 1299)
+      // less than 2.9 V only .2V difference to Warn-Level
+#define WARN_LEVEL (((unsigned long)(BAT_POOR+200)*(unsigned long)33)/133)
+#else
+      // less than 1.3 V only .1V difference to Warn-Level
+#define WARN_LEVEL (((unsigned long)(BAT_POOR+100)*(unsigned long)33)/133)
+#endif
+
+#define POOR_LEVEL (((unsigned long)(BAT_POOR)*(unsigned long)33)/133)
+
+    // check the battery voltage
+    if (trans.uBE[0] <  WARN_LEVEL) {
+
+        // Vcc < 7,3V; show Warning
+        if(trans.uBE[0] < POOR_LEVEL) {
+            // Vcc <6,3V; no proper operation is possible
+            lcdPgmString(BatEmpty);	// Battery empty!
+            delay(2000);;
+            PORTD = 0;			// switch power off
+            return;
+        }
+
+        lcdPgmString(BatWeak);		// Battery weak
+    } else {                            // Battery-voltage OK
+        lcdPgmString(OK_str); 		// "OK"
+    }
+#endif
+}
