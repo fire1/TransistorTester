@@ -1,4 +1,4 @@
-// new code by K.-H. Kübbeler
+// new code by K.-H. Kï¿½bbeler
 // ReadCapacity tries to find the value of a capacitor by measuring the load time.
 // first of all the capacitor is discharged.
 // Then a series of up to 500 load pulses with 10ms duration each is done across the R_L (680Ohm)
@@ -22,7 +22,7 @@
 // cap.cval = value of the capacitor 
 // cap.cval_uncorrected = value of the capacitor uncorrected
 // cap.esr = serial resistance of capacitor,  0.01 Ohm units
-// cap.cpre = units of cap.cval (-12==pF, -9=nF, -6=µF)
+// cap.cpre = units of cap.cval (-12==pF, -9=nF, -6=ï¿½F)
 // ca   = Pin number (0-2) of the LowPin
 // cb   = Pin number (0-2) of the HighPin
 
@@ -86,7 +86,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 #endif
   cap.cval = 0;				// set capacity value to zero
   cap.cpre = -12;			//default unit is pF
-  EntladePins();			// discharge capacitor
+    unloadingPins();			// discharge capacitor
   ADC_PORT = TXD_VAL;			// switch ADC-Port to GND
   R_PORT = 0;				// switch R-Port to GND
   ADC_DDR = LoADC;			// switch Low-Pin to output (GND)
@@ -137,7 +137,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
   if ((ovcnt16 == 0 ) && (adcv[2] > 1300)) {
      goto messe_mit_rh;		// Voltage of more than 1300mV is reached in one pulse, too fast loaded
   }
-  // Capacity is more than about 50µF
+  // Capacity is more than about 50ï¿½F
 #ifdef NO_CAP_HOLD_TIME
   ChargePin10ms(HiPinR_H,0);		//switch HighPin with R_H 10ms auf GND, then currentless
   adcv[3] = ReadADC(HighPin) - adcv[0]; // read voltage again, is discharged only a little bit ?
@@ -234,8 +234,8 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 //==================================================================================
 // Measurement of little capacity values
 messe_mit_rh:
-  //little capacity value, about  < 50 µF
-  EntladePins();			// discharge capacitor
+  //little capacity value, about  < 50 ï¿½F
+    unloadingPins();			// discharge capacitor
   //measure with the R_H (470kOhm) resistor 
   R_PORT = 0;		// R_DDR ist HiPinR_L
   ADC_DDR = (1<<TP1) | (1<<TP2) | (1<<TP3) | (1<<TxD);	//switch all Pins to output

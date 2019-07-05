@@ -70,7 +70,7 @@ void setup()   {
   // Clear the buffer.
   display.clearDisplay();
 
-  // draw a single pixel
+  // lcdDraw a single pixel
   display.drawPixel(10, 10, WHITE);
   // Show the display buffer on the hardware.
   // NOTE: You _must_ call display after making any drawing commands
@@ -79,31 +79,31 @@ void setup()   {
   delay(2000);
   display.clearDisplay();
 
-  // draw many lines
+  // lcdDraw many lines
   testdrawline();
   display.display();
   delay(2000);
   display.clearDisplay();
 
-  // draw rectangles
+  // lcdDraw rectangles
   testdrawrect();
   display.display();
   delay(2000);
   display.clearDisplay();
 
-  // draw multiple rectangles
+  // lcdDraw multiple rectangles
   testfillrect();
   display.display();
   delay(2000);
   display.clearDisplay();
 
-  // draw mulitple circles
+  // lcdDraw mulitple circles
   testdrawcircle();
   display.display();
   delay(2000);
   display.clearDisplay();
 
-  // draw a white circle, 10 pixel radius
+  // lcdDraw a white circle, 10 pixel radius
   display.fillCircle(display.width()/2, display.height()/2, 10, WHITE);
   display.display();
   delay(2000);
@@ -125,13 +125,13 @@ void setup()   {
   delay(2000);
   display.clearDisplay();
 
-  // draw the first ~12 characters in the font
+  // lcdDraw the first ~12 characters in the font
   testdrawchar();
   display.display();
   delay(2000);
   display.clearDisplay();
 
-  // draw scrolling text
+  // lcdDraw scrolling text
   testscrolltext();
   delay(2000);
   display.clearDisplay();
@@ -160,7 +160,7 @@ void setup()   {
   display.invertDisplay(false);
   delay(1000); 
 
-  // draw a bitmap icon and 'animate' movement
+  // lcdDraw a bitmap icon and 'animate' movement
   testdrawbitmap(logo16_glcd_bmp, LOGO16_GLCD_HEIGHT, LOGO16_GLCD_WIDTH);
 }
 
@@ -188,7 +188,7 @@ void testdrawbitmap(const uint8_t *bitmap, uint8_t w, uint8_t h) {
   }
 
   while (1) {
-    // draw each icon
+    // lcdDraw each icon
     for (uint8_t f=0; f< NUMFLAKES; f++) {
       display.drawBitmap(icons[f][XPOS], icons[f][YPOS], logo16_glcd_bmp, w, h, WHITE);
     }

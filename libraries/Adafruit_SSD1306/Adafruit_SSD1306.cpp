@@ -591,7 +591,7 @@ void Adafruit_SSD1306::drawFastHLineInternal(int16_t x, int16_t y, int16_t w, ui
   // Do bounds/limit checks
   if(y < 0 || y >= HEIGHT) { return; }
 
-  // make sure we don't try to draw below 0
+  // make sure we don't try to lcdDraw below 0
   if(x < 0) { 
     w += x;
     x = 0;
@@ -661,7 +661,7 @@ void Adafruit_SSD1306::drawFastVLineInternal(int16_t x, int16_t __y, int16_t __h
   // do nothing if we're off the left or right side of the screen
   if(x < 0 || x >= WIDTH) { return; }
 
-  // make sure we don't try to draw below 0
+  // make sure we don't try to lcdDraw below 0
   if(__y < 0) { 
     // __y is negative, this will subtract enough from __h to account for __y being 0
     __h += __y;

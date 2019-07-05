@@ -250,7 +250,7 @@ void Adafruit_GFX::drawRoundRect(int16_t x, int16_t y, int16_t w,
   drawFastHLine(x+r  , y+h-1, w-2*r, color); // Bottom
   drawFastVLine(x    , y+r  , h-2*r, color); // Left
   drawFastVLine(x+w-1, y+r  , h-2*r, color); // Right
-  // draw four corners
+  // lcdDraw four corners
   drawCircleHelper(x+r    , y+r    , r, 1, color);
   drawCircleHelper(x+w-r-1, y+r    , r, 2, color);
   drawCircleHelper(x+w-r-1, y+h-r-1, r, 4, color);
@@ -263,7 +263,7 @@ void Adafruit_GFX::fillRoundRect(int16_t x, int16_t y, int16_t w,
   // smarter version
   fillRect(x+r, y, w-2*r, h, color);
 
-  // draw four corners
+  // lcdDraw four corners
   fillCircleHelper(x+w-r-1, y+r, r, 1, h-2*r-1, color);
   fillCircleHelper(x+r    , y+r, r, 2, h-2*r-1, color);
 }

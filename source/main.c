@@ -245,7 +245,7 @@ start:
 #ifndef DebugOut
   lcd_line2();			//LCD position row 2, column 1
 #endif
-  EntladePins();		// discharge all capacitors!
+    unloadingPins();		// discharge all capacitors!
   if(PartFound == PART_CELL) {
       lcdClear();
       lcdFixString(Cell_str);	// display "Cell!"
@@ -269,7 +269,7 @@ start:
   
   //separate check if is is a capacitor
   if(((PartFound == PART_NONE) || (PartFound == PART_RESISTOR) || (PartFound == PART_DIODE)) ) {
-     EntladePins();		// discharge capacities
+      unloadingPins();		// discharge capacities
      //measurement of capacities in all 3 combinations
      cap.cval_max = 0;		// set max to zero
      cap.cpre_max = -12;	// set max to pF unit
@@ -759,7 +759,7 @@ void ChargePin10ms(uint8_t PinToCharge, uint8_t ChargeDirection) {
 }
 
 // first discharge any charge of capacitors
-void EntladePins() {
+void unloadingPins() {
   uint8_t adc_gnd;		// Mask of ADC-outputs, which can be directly connected to GND
   unsigned int adcmv[3];	// voltages of 3 Pins in mV
   unsigned int clr_cnt;		// Clear Counter

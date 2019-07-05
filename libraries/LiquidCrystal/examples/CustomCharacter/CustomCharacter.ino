@@ -125,11 +125,11 @@ void loop() {
   int delayTime = map(sensorReading, 0, 1023, 200, 1000);
   // set the cursor to the bottom row, 5th position:
   lcd.setCursor(4, 1);
-  // draw the little man, arms down:
+  // lcdDraw the little man, arms down:
   lcd.write(3);
   delay(delayTime);
   lcd.setCursor(4, 1);
-  // draw him arms up:
+  // lcdDraw him arms up:
   lcd.write(4);
   delay(delayTime); 
 }

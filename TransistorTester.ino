@@ -1262,7 +1262,7 @@ U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
 // begin of transistortester program
 void setup() {
     Serial.begin(115200);
-    pinMode(RST_PIN, INPUT_PULLUP);
+    pinMode(RST_PIN, INPUT); // do not use pullup
 
 
 #ifdef lcdU8
@@ -1400,23 +1400,7 @@ void setup() {
 
 void loop() {
     start:
-
-#ifdef NOK5110
-    lcd.display();
-#endif
-
-#ifdef OLED096
-    display.display();
-#endif
-
-#ifdef lcdU8
-    u8g2.sendBuffer();
-    delay(300);
-    u8g2.clearBuffer();
-    lcd_line1();
-#endif
-
-
+    lcdDraw();
     TestKey = 1;
     while (TestKey) {
         TestKey = digitalRead(RST_PIN);
@@ -1427,8 +1411,9 @@ void loop() {
         delay(100);
     }
 
+    trigger:
     Serial.println(F("Btn press"));
-
+    delay(100);
     lcdClear();
     delay(100);
 
@@ -1569,21 +1554,12 @@ void loop() {
     lcd_line2();        // LCD position row 2, column 1
 #endif
 
-#ifdef NOK5110
-    lcd.display();
-#endif
-
-#ifdef OLED096
-    display.display();
-    display.setCursor(0, 0);
-#endif
-
 #ifdef lcdU8
     u8g2.sendBuffer();
     u8g2.setCursor(0, 0);
 #endif
 
-    EntladePins();        // discharge all capacitors!
+    unloadingPins();        // discharge all capacitors!
 
     if (PartFound == PART_CELL) {
         lcdClear();
@@ -1606,7 +1582,7 @@ void loop() {
 
     // separate check if is is a capacitor
     if (((PartFound == PART_NONE) || (PartFound == PART_RESISTOR) || (PartFound == PART_DIODE))) {
-        EntladePins();        // discharge capacities
+        unloadingPins();        // discharge capacities
         // measurement of capacities in all 3 combinations
         cap.cval_max = 0;        // set max to zero
         cap.cpre_max = -12;        // set max to pF unit
@@ -2078,6 +2054,7 @@ void loop() {
 
     empty_count++;
     mess_count = 0;
+    lcdDraw();
     goto end2;
 
     gakOutput:
@@ -2090,24 +2067,38 @@ void loop() {
     mess_count++;
     Serial.println();
     Serial.print(F("Ending 1"));
-
+    lcdDraw();
 
     end2:
     //ADC_DDR = (1<<TPREF) | TXD_MSK;  // switch pin with reference to GND, release relay
     ADC_DDR = TXD_MSK;                 // switch pin with reference to GND, release relay
-    goto start;
+//    goto start;
 
-    while (!(ON_PIN_REG & (1 << RST_PIN)));    // wait ,until button is released
-    wait_about200ms();
-    // wait 14 seconds or 5 seconds (if repeat function)
     Serial.print(F("Ending 2"));
+//    while (!(ON_PIN_REG & (1 << RST_PIN)));    // wait ,until button is released
+    int buttonState = HIGH;
+    while (1) {
+        buttonState = analogRead(RST_PIN);
+
+        Serial.print(F("State "));
+        Serial.print(buttonState);
+        Serial.println();
+        delay(10);
+        if (buttonState < 980) {
+            return;
+        }
+    }
+    Serial.print(F("Go to start"));
+    goto trigger;
+
+    // wait 14 seconds or 5 seconds (if repeat function)
     for (gthvoltage = 0; gthvoltage < display_time; gthvoltage += 10) {
         if (!(ON_PIN_REG & (1 << RST_PIN))) {
             // If the key is pressed again...
             // goto start of measurement
             goto start;
         }
-        wdt_reset();
+//        wdt_reset();
         wait_about10ms();
     }
 
@@ -2209,7 +2200,7 @@ void ChargePin10ms(uint8_t PinToCharge, uint8_t ChargeDirection) {
 
 
 // first discharge any charge of capacitors
-void EntladePins() {
+void unloadingPins() {
     uint8_t adc_gnd;        // Mask of ADC-outputs, which can be directly connected to GND
     unsigned int adcmv[3];    // voltages of 3 Pins in mV
     unsigned int clr_cnt;        // Clear Counter
@@ -4290,7 +4281,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 
     cap.cval = 0;                // set capacity value to zero
     cap.cpre = -12;            // default unit is pF
-    EntladePins();            // discharge capacitor
+    unloadingPins();            // discharge capacitor
 
     ADC_PORT = TXD_VAL;            // switch ADC-Port to GND
     R_PORT = 0;                // switch R-Port to GND
@@ -4477,7 +4468,7 @@ void ReadCapacity(uint8_t HighPin, uint8_t LowPin) {
 // Measurement of little capacity values
     messe_mit_rh:
     // little capacity value, about  < 50 uF
-    EntladePins();            // discharge capacitor
+    unloadingPins();            // discharge capacitor
 
     // measure with the R_H (470kOhm) resistor
     R_PORT = 0;        // R_DDR ist HiPinR_L
@@ -5300,7 +5291,7 @@ uint16_t GetESR(uint8_t hipin, uint8_t lopin) {
     // offset is about (x*10*200)/34000 in 0.01 Ohm units
     sumvolt[1] = 0;        // clear sum of HighPin voltage without current
     sumvolt[3] = 0;        // clear sum of HighPin voltage without current
-    EntladePins();        // discharge capacitor
+    unloadingPins();        // discharge capacitor
     ADC_PORT = TXD_VAL;        // switch ADC-Port to GND
     ADMUX = SelectLowPin;        // set Mux input and Voltage Reference to internal 1.1V
 
@@ -5508,7 +5499,7 @@ void GetVloss() {
     LoADC = pgm_read_byte(&PinADCtab[cap.ca]) | TXD_MSK;
     HiPinR_L = pgm_read_byte(&PinRLtab[cap.cb]);        // R_L mask for HighPin R_L load
 
-    EntladePins();            // discharge capacitor
+    unloadingPins();            // discharge capacitor
     ADC_PORT = TXD_VAL;            // switch ADC-Port to GND
     R_PORT = 0;                // switch R-Port to GND
     ADC_DDR = LoADC;            // switch Low-Pin to output (GND)
@@ -5591,7 +5582,7 @@ void GetVloss() {
 #endif
 
     // discharge capacitor again
-    EntladePins();        // discharge capacitors
+    unloadingPins();        // discharge capacitors
     // ready
     // switch all ports to input
 
@@ -5820,6 +5811,14 @@ void drawBmp(const uint8_t *bitmap) {
     u8g2.drawXBMP(64, 0, 48, 64, bitmap);
 }
 
+
+void lcdDraw() {
+    u8g2.sendBuffer();
+    delay(300);
+    u8g2.clearBuffer();
+    lcd_line1();
+}
+
 void serialPut(const __FlashStringHelper *data) {
     Serial.print(data);
     delay(2);
@@ -5829,5 +5828,6 @@ void serialPut(uint8_t data) {
     Serial.write(data);
     delay(2);
 }
+
 
 #endif

@@ -18,5 +18,5 @@ Useful Resources
      https://github.com/ehubin/Adafruit-GFX-Library/tree/master/Img2Code
 
 -  drawXBitmap function
-   You can use the GIMP photo editor to save a .xbm file and use the array saved in the file to draw a bitmap with the drawXBitmap function. See the pull request here for more details:
+   You can use the GIMP photo editor to save a .xbm file and use the array saved in the file to lcdDraw a bitmap with the drawXBitmap function. See the pull request here for more details:
      https://github.com/adafruit/Adafruit-GFX-Library/pull/31

@@ -31,6 +31,8 @@ void lcdFlashString(const __FlashStringHelper *str);
 
 void lcdSpace(void);
 
+void lcdDraw();
+
 unsigned int W5msReadADC(uint8_t Probe);
 
 unsigned int W10msReadADC(uint8_t Probe);
@@ -64,6 +66,6 @@ void RefVoltage(void);
 void PinLayout(char pin1, char pin2, char pin3);
 
 uint16_t GetESR(uint8_t hipin, uint8_t lopin);
-
+void unloadingPins();
 
 #endif //TRANSISTORTESTER_TRANSISTORTESTER_H
