@@ -19,13 +19,7 @@
 #include <Arduino.h>
 
 #include <avr/sleep.h>
-
 #include <avr/wdt.h>
-#include <avr/interrupt.h>
-#include <math.h>
-#include <stdint.h>
-#include <avr/power.h>
-#include "TransistorTester.h"
 
 
 #define OLED_I2C
@@ -692,24 +686,6 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #define CHECK_CALL
 #endif
 
-#ifdef AUTO_CAL
-// AutoCheck Function is needed
-#define CHECK_CALL
-#define RR680PL resis680pl
-#define RR680MI resis680mi
-#define RRpinPL pin_rpl
-#define RRpinMI pin_rmi
-#else
-#define RR680PL (R_L_VAL + PIN_RP)
-#define RR680MI (R_L_VAL + PIN_RM)
-#define RRpinPL (PIN_RP)
-#define RRpinMI (PIN_RM)
-#endif
-
-#ifndef ESR_ZERO
-// define a default zero value for ESR measurement (0.01 Ohm units)
-#define ESR_ZERO 20
-#endif
 
 #ifndef RESTART_DELAY_TICS
 // define the processor restart delay for crystal oscillator 16K
@@ -745,9 +721,10 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 #define MAIN_C
 
 #include "graphics/bitmap48x64.h"
+#include "TransistorTester.h"
 
 #if defined(MAIN_C)
-#define COMMON
+
 /*
   The voltage at a capacitor grows with  Uc = VCC * (1 - e**(-t/T))
   The voltage 1.3V is reached at  t = -ln(3.7/5)*T  = 0.3011*T .
@@ -764,7 +741,7 @@ Is SWUART_INVERT defined, the UART works is inverse mode
 // of load pulses (*10).
 
 // Widerstand 680 Ohm                300   325   350   375   400   425   450   475   500   525   550   575   600   625   650   675   700   725   750   775   800   825   850   875   900   925   950   975  1000  1025  1050  1075  1100  1125  1150  1175  1200  1225  1250  1275  1300  1325  1350  1375  1400  mV
-const uint16_t RLtab[] MEM_TEXT = {22447, 20665, 19138, 17815, 16657, 15635, 14727, 13914, 13182, 12520, 11918, 11369,
+const uint16_t RLtab[] PROGMEM = {22447, 20665, 19138, 17815, 16657, 15635, 14727, 13914, 13182, 12520, 11918, 11369,
                                    10865, 10401, 9973, 9577, 9209, 8866, 8546, 8247, 7966, 7702, 7454, 7220, 6999, 6789,
                                    6591, 6403, 6224, 6054, 5892, 5738, 5590, 5449, 5314, 5185, 5061, 4942, 4828, 4718,
                                    4613, 4511, 4413, 4319, 4228};
@@ -792,16 +769,6 @@ const unsigned char PinRLtab[] PROGMEM = {(1 << (TP1 * 2)), (1 << (TP2 * 2)), (1
         << (TP3 * 2))};  // Table of commands to switch the  R-L resistors Pin 0,1,2
 const unsigned char PinADCtab[] PROGMEM = {(1 << TP1), (1 << TP2),
                                            (1 << TP3)};  // Table of commands to switch the ADC-Pins 0,1,2
-
-/*
-// generate Omega- and u-character as Custom-character, if these characters has a number of loadable type
-#if LCD_CHAR_OMEGA < 8
-  const unsigned char CyrillicOmegaIcon[] MEM_TEXT = {0,0,14,17,17,10,27,0};	// Omega
-#endif
-#if LCD_CHAR_U < 8
-  const unsigned char CyrillicMuIcon[] MEM_TEXT = {0,17,17,17,19,29,16,16};	// micro
-#endif
-*/
 
 #ifdef AUTO_CAL
 //const uint16_t R680pl EEMEM = R_L_VAL+PIN_RP;	// total resistor to VCC
@@ -862,86 +829,6 @@ unsigned int RHmultip = DEFAULT_RH_FAKT;
 
 #endif  // MAIN_C
 
-
-struct Diode_t {
-    uint8_t Anode;
-    uint8_t Cathode;
-    unsigned int Voltage;
-};
-
-COMMON struct Diode_t diodes[6];
-COMMON uint8_t NumOfDiodes;
-
-COMMON struct {
-    unsigned long hfe[2];        // current amplification factor
-    unsigned int uBE[2];        // B-E-voltage of the Transistor
-    uint8_t b, c, e;        // pins of the Transistor
-} trans;
-
-COMMON unsigned int gthvoltage;    // Gate-threshold voltage
-
-COMMON uint8_t PartReady;    // part detection is finished
-COMMON uint8_t PartMode;
-COMMON uint8_t tmpval, tmpval2;
-COMMON unsigned int ref_mv;     // Reference-voltage  in mV units
-
-COMMON struct resis_t {
-    unsigned long rx;        // value of resistor RX
-#if FLASHEND > 0x1fff
-    unsigned long lx;        // inductance 10uH or 100uH
-    int8_t lpre;        // prefix for inductance
-#endif
-    uint8_t ra, rb;        // Pins of RX
-    uint8_t rt;            // Tristate-Pin (inactive)
-} resis[3];
-
-COMMON uint8_t ResistorsFound;    // Number of found resistors
-COMMON uint8_t ii;        // multipurpose counter
-
-COMMON struct cap_t {
-    unsigned long cval;        // capacitor value
-    unsigned long cval_max;    // capacitor with maximum value
-    union t_combi {
-        unsigned long dw;        // capacity value without corrections
-        uint16_t w[2];
-    } cval_uncorrected;
-#if FLASHEND > 0x1fff
-    unsigned int esr;        // serial resistance of C in 0.01 Ohm
-    unsigned int v_loss;    // voltage loss 0.1%
-#endif
-    uint8_t ca, cb;        // pins of capacitor
-    int8_t cpre;            // Prefix for capacitor value  -12=p, -9=n, -6=u, -3=m
-    int8_t cpre_max;        // Prefix of the biggest capacitor
-} cap;
-
-#ifndef INHIBIT_SLEEP_MODE
-// with sleep mode we need a global ovcnt16
-COMMON volatile uint16_t ovcnt16;
-COMMON volatile uint8_t unfinished;
-#endif
-
-COMMON int16_t load_diff;    // difference voltage of loaded capacitor and internal reference
-
-COMMON uint8_t WithReference;    // Marker for found precision voltage reference = 1
-COMMON uint8_t PartFound;    // the found part
-COMMON char outval[12];        // String for ASCII-outpu
-COMMON uint8_t empty_count;    // counter for max count of empty measurements
-COMMON uint8_t mess_count;    // counter for max count of nonempty measurements
-
-COMMON struct ADCconfig_t {
-    uint8_t Samples;        // number of ADC samples to take
-    uint8_t RefFlag;        // save Reference type VCC of IntRef
-    uint16_t U_Bandgap;        // Reference Voltage in mV
-    uint16_t U_AVCC;        // Voltage of AVCC
-} ADCconfig;
-
-#ifdef AUTO_CAL
-COMMON uint8_t pin_combination;    // coded Pin-combination  2:1,3:1,1:2,x:x,3:2,1:3,2:3
-COMMON uint16_t resis680pl;    // port output resistance + 680
-COMMON uint16_t resis680mi;    // port output resistance + 680
-COMMON uint16_t pin_rmi;    // port output resistance to GND side, 0.1 Ohm units
-COMMON uint16_t pin_rpl;    // port output resistance to VCC side, 0.1 Ohm units
-#endif
 
 #if POWER_OFF + 0 > 1
 COMMON unsigned int display_time;	// display time of measurement in ms units
@@ -1556,27 +1443,13 @@ batteryCheck();
                 lcdFixString(KatAn);  // "-|<-"
             }
         }
-
-#if defined(NOK5110) || defined(OLED096)|| defined(lcdU8)
         lcd_line2();
-#endif
-
         PinLayout('E', 'B', 'C');        // EBC= or 123=...
-
-#if defined(NOK5110) || defined(OLED096)|| defined(lcdU8)
         lcd_line3();
-#else
-        lcd_line2();  // 2 row
-#endif
-
         lcdFixString(hfe_str);        // "B="  (hFE)
         displayValue(trans.hfe[0], 0, 0, 3);
         lcdSpace();
-
-#if defined(NOK5110) || defined(OLED096) || defined(lcdU8)
         lcd_line4();
-#endif
-
         lcdFixString(Uf_str);        // "Uf="
         displayValue(trans.uBE[0], -3, 'V', 3);
         goto end;
@@ -5496,12 +5369,35 @@ void lcdFixString(const unsigned char *data) {
 
 // sends data byte to the LCD
 void lcdData(unsigned char temp1) {
-
-#ifdef lcdU8
     u8g2.write(temp1);
-#endif
+    serialPut(temp1);
+}
 
-    switch (temp1) {
+void lcdClear(void) {
+    u8g2.clearDisplay();
+    lcd_line1();
+    uart_newline();
+}
+
+void drawBmp(const uint8_t *bitmap) {
+    u8g2.drawXBMP(64, 0, 48, 64, bitmap);
+}
+
+
+void lcdDraw() {
+    u8g2.sendBuffer();
+    delay(300);
+    u8g2.clearBuffer();
+    lcd_line1();
+}
+
+void serialPut(const __FlashStringHelper *data) {
+    Serial.print(data);
+    delay(2);
+}
+
+void serialPut(uint8_t data) {
+    switch (data) {
         case LCD_CHAR_DIODE1: {
             serialPut(F(" ->|-"));
             break;
@@ -5529,51 +5425,9 @@ void lcdData(unsigned char temp1) {
             break;
         }
         default: {
-            serialPut(temp1);
+            Serial.write(data);
         }
     }
-}
-
-void lcdClear(void) {
-#ifdef LCD1602
-    lcd.clear();
-#endif
-
-#ifdef NOK5110
-    lcd.clearDisplay();
-#endif
-
-#ifdef OLED096
-    display.clearDisplay();
-#endif
-
-#ifdef lcdU8
-    u8g2.clearDisplay();
-#endif
-
-    lcd_line1();
-    uart_newline();
-}
-
-void drawBmp(const uint8_t *bitmap) {
-    u8g2.drawXBMP(64, 0, 48, 64, bitmap);
-}
-
-
-void lcdDraw() {
-    u8g2.sendBuffer();
-    delay(300);
-    u8g2.clearBuffer();
-    lcd_line1();
-}
-
-void serialPut(const __FlashStringHelper *data) {
-    Serial.print(data);
-    delay(2);
-}
-
-void serialPut(uint8_t data) {
-    Serial.write(data);
     delay(2);
 }
 
@@ -5583,10 +5437,6 @@ void waitForButton() {
     buttonState = 1023;
     while (1) {
         buttonState = analogRead(RST_PIN);
-
-        Serial.print(F("State "));
-        Serial.print(buttonState);
-        Serial.println();
         delay(10);
         if (buttonState < 980) {
             return;
