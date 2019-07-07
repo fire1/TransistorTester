@@ -43,10 +43,10 @@ const unsigned char GateCap_str[] PROGMEM = "C=";
 const unsigned char hfe_str[] PROGMEM = "B=";
 const unsigned char NPN_str[] PROGMEM = "NPN ";
 const unsigned char PNP_str[] PROGMEM = "PNP ";
-const unsigned char N123_str[] PROGMEM = " 123=";
+const unsigned char N123_str[] PROGMEM = "123=";
 
 const unsigned char Uf_str[] PROGMEM = "Uf=";
-const unsigned char vt_str[] PROGMEM = " Vt=";
+const unsigned char vt_str[] PROGMEM = "Vt=";
 const unsigned char Vgs_str[] PROGMEM = "@Vgs=";
 const unsigned char CapZeich[] PROGMEM = {'-', LCD_CHAR_CAP, '-', 0};
 const unsigned char Cell_str[] PROGMEM = "Cell!";
