@@ -107,6 +107,7 @@ COMMON uint16_t pin_rpl;    // port output resistance to VCC side, 0.1 Ohm units
 // define a default zero value for ESR measurement (0.01 Ohm units)
 #define ESR_ZERO 20
 #endif
+
 void lcdString(char *data);
 
 void lcdCursor(uint8_t row, uint8_t col);
@@ -173,4 +174,5 @@ void waitForButton();
 
 void AutoCheck(void);
 
+void printBattery();
 #endif //TRANSISTORTESTER_TRANSISTORTESTER_H

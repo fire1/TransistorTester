@@ -246,6 +246,7 @@
 // Port pin for Battery voltage measuring
 #define TPBAT A7 // 22
 
+//#define BAT_CHECK
 /*
   exact values of used resistors (Ohm).
   The standard value for R_L is 680 Ohm, for R_H 470kOhm.
@@ -985,13 +986,14 @@ U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
 void setup() {
     Serial.begin(115200);
     pinMode(RST_PIN, INPUT); // do not use pullup
-
+    pinMode(A7, INPUT);
 
 #ifdef lcdU8
     u8g2.begin();
 //    u8g2.setFont(u8g2_font_profont12_tf);
     u8g2.setFont(u8g_font_pro_ev);
 
+    delay(100);
 
     lcdFlashString(F("Transistor"));
     lcdCursor(1, 0);
@@ -1000,18 +1002,14 @@ void setup() {
     lcdFlashString(F("for Arduino"));
     lcdCursor(3, 0);
     lcdPgmString(VERSION_str);
+    lcdCursor(4, 0);
+    lcdFlashString(F("Battery: "));
+    printBattery();
+
 //
 #endif
 
-#if defined(NOK5110) || defined(OLED096)
-    lcd_string("Transistor");
-    lcd_set_cursor(1, 0);
-    lcd_string("Tester");
-    lcd_set_cursor(2, 0);
-    lcd_string("for Arduino");
-    lcd_set_cursor(3, 0);
-    lcd_string("1.08.003");
-#endif
+
 
     //ON_DDR = 0;
     //ON_PORT = 0;
@@ -1186,7 +1184,7 @@ batteryCheck();
             lcdSpace();
             displayValue(ADCconfig.U_AVCC, -3, 'V', 3);    // Display 3 Digits of this mV units
             lcdSpace();
-            displayValue(RRpinMI,-1,LCD_CHAR_OMEGA,4);
+            displayValue(RRpinMI, -1, LCD_CHAR_OMEGA, 4);
             delay(300);
         }
     }
@@ -5501,4 +5499,18 @@ void batteryCheck() {
         lcdPgmString(OK_str); 		// "OK"
     }
 #endif
+}
+
+
+void printBattery() {
+    int read = analogRead(TPBAT);
+    float volt = read * (5.0 / 1023.0);
+    uint8_t prc = map(volt * 100, 300, 415, 0, 100);
+    u8g2.print(volt);
+    u8g2.print(F("V "));
+    if (prc > 100) {
+        prc = 100;
+    }
+    u8g2.print(prc);
+    u8g2.print(F("% "));
 }
